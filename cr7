@@ -1,0 +1,2531 @@
+--[[
+    Ultimate UI Framework for Roblox
+    Version: 3.0.0 - Premium Professional
+    Author: Expert Lua Developer
+    Features: 
+    - Glassmorphism Design
+    - RTL/Arabic Support
+    - Custom Components System
+    - Animations & Transitions
+    - Config Save/Load
+    - Mobile Responsive
+]]
+
+-- Initialize Library
+local UltimateUI = {}
+UltimateUI.__index = UltimateUI
+
+-- Services
+local TweenService = game:GetService("TweenService")
+local UserInputService = game:GetService("UserInputService")
+local RunService = game:GetService("RunService")
+local HttpService = game:GetService("HttpService")
+local Players = game:GetService("Players")
+local TextService = game:GetService("TextService")
+
+-- Constants
+local SCREEN_GUI_NAME = "UltimateUI_Frame"
+local CONFIG_FOLDER = "UltimateUI_Configs"
+
+-- Modern Color Palette (Professional Glassmorphism)
+local Theme = {
+    Colors = {
+        Primary = Color3.fromRGB(18, 18, 28),
+        Secondary = Color3.fromRGB(32, 32, 48),
+        Accent = Color3.fromRGB(0, 175, 255),
+        Text = Color3.fromRGB(245, 245, 250),
+        SubText = Color3.fromRGB(170, 170, 190),
+        Glass = Color3.fromRGB(255, 255, 255),
+        Success = Color3.fromRGB(0, 215, 135),
+        Warning = Color3.fromRGB(255, 195, 55),
+        Error = Color3.fromRGB(255, 85, 85),
+        DarkAccent = Color3.fromRGB(0, 145, 210),
+        LightAccent = Color3.fromRGB(100, 215, 255),
+        Background = Color3.fromRGB(10, 10, 15),
+        Surface = Color3.fromRGB(25, 25, 35)
+    },
+    
+    Fonts = {
+        Arabic = Font.new(
+            "rbxassetid://12187365319",
+            Enum.FontWeight.Medium,
+            Enum.FontStyle.Normal
+        ),
+        English = Font.new(
+            "rbxassetid://12187365364",
+            Enum.FontWeight.Medium,
+            Enum.FontStyle.Normal
+        )
+    },
+    
+    Transparencies = {
+        Window = 0.05,
+        Header = 0.15,
+        Card = 0.85,
+        Button = 0.2,
+        Glass = 0.95
+    },
+    
+    CornerRadius = {
+        Large = 18,
+        Medium = 14,
+        Small = 10,
+        Circle = 100
+    },
+    
+    Animations = {
+        Duration = 0.25,
+        Easing = Enum.EasingStyle.Quad,
+        Direction = Enum.EasingDirection.Out
+    }
+}
+
+-- Premium Icons Library (مختارة بعناية)
+local Icons = {
+    ["accessibility"] = "rbxassetid://10709751939",
+    ["activity"] = "rbxassetid://10709752035",
+    ["settings"] = "rbxassetid://10734950309",
+    ["user"] = "rbxassetid://10747373176",
+    ["users"] = "rbxassetid://10747373426",
+    ["shield"] = "rbxassetid://10734951847",
+    ["lock"] = "rbxassetid://10723434711",
+    ["unlock"] = "rbxassetid://10747366027",
+    ["key"] = "rbxassetid://10723416652",
+    ["bell"] = "rbxassetid://10709775704",
+    ["star"] = "rbxassetid://10734966248",
+    ["heart"] = "rbxassetid://10723406885",
+    ["moon"] = "rbxassetid://10734897102",
+    ["sun"] = "rbxassetid://10734974297",
+    ["wifi"] = "rbxassetid://10747382504",
+    ["bluetooth"] = "rbxassetid://10709776655",
+    ["battery"] = "rbxassetid://10709774640",
+    ["volume"] = "rbxassetid://10747376008",
+    ["camera"] = "rbxassetid://10709789686",
+    ["music"] = "rbxassetid://10734905958",
+    ["video"] = "rbxassetid://10747374938",
+    ["image"] = "rbxassetid://10723415040",
+    ["file"] = "rbxassetid://10723374641",
+    ["folder"] = "rbxassetid://10723387563",
+    ["download"] = "rbxassetid://10723344270",
+    ["upload"] = "rbxassetid://10747366434",
+    ["cloud"] = "rbxassetid://10709806740",
+    ["database"] = "rbxassetid://10709818996",
+    ["server"] = "rbxassetid://10734949856",
+    ["cpu"] = "rbxassetid://10709813383",
+    ["home"] = "rbxassetid://10723407389",
+    ["building"] = "rbxassetid://10709783051",
+    ["car"] = "rbxassetid://10709789810",
+    ["plane"] = "rbxassetid://10734922971",
+    ["rocket"] = "rbxassetid://10734934585",
+    ["globe"] = "rbxassetid://10723404337",
+    ["map"] = "rbxassetid://10734886202",
+    ["flag"] = "rbxassetid://10723375890",
+    ["creditcard"] = "rbxassetid://10709870178",
+    ["dollar"] = "rbxassetid://10723343958",
+    ["shoppingcart"] = "rbxassetid://10734952479",
+    ["gift"] = "rbxassetid://10723396402",
+    ["tag"] = "rbxassetid://10734976528",
+    ["puzzle"] = "rbxassetid://10734930886",
+    ["target"] = "rbxassetid://10734977012",
+    ["award"] = "rbxassetid://10709769406",
+    ["trophy"] = "rbxassetid://10747363809",
+    ["lightbulb"] = "rbxassetid://10723425852",
+    ["fire"] = "rbxassetid://10723376114",
+    ["zap"] = "rbxassetid://10747373821",
+    ["droplet"] = "rbxassetid://10723344432",
+    ["leaf"] = "rbxassetid://10723425539",
+    ["tree"] = "rbxassetid://10747362748",
+    ["flower"] = "rbxassetid://10747830374",
+    ["calendar"] = "rbxassetid://10709789505",
+    ["clock"] = "rbxassetid://10709805144",
+    ["timer"] = "rbxassetid://10734984606",
+    ["bellring"] = "rbxassetid://10709775560",
+    ["message"] = "rbxassetid://10734888228",
+    ["mail"] = "rbxassetid://10734885430",
+    ["phone"] = "rbxassetid://10734921524",
+    ["send"] = "rbxassetid://10734943902",
+    ["edit"] = "rbxassetid://10734883598",
+    ["trash"] = "rbxassetid://10747362393",
+    ["save"] = "rbxassetid://10734941499",
+    ["copy"] = "rbxassetid://10709812159",
+    ["share"] = "rbxassetid://10734950813",
+    ["refresh"] = "rbxassetid://10734933222",
+    ["search"] = "rbxassetid://10734943674",
+    ["zoom"] = "rbxassetid://10747384552",
+    ["grid"] = "rbxassetid://10723404936",
+    ["list"] = "rbxassetid://10723433811",
+    ["menu"] = "rbxassetid://10734887784",
+    ["check"] = "rbxassetid://10709790644",
+    ["x"] = "rbxassetid://10747384394",
+    ["plus"] = "rbxassetid://10734924532",
+    ["minus"] = "rbxassetid://10734896206",
+    ["question"] = "rbxassetid://10723406988",
+    ["alert"] = "rbxassetid://10709752996",
+    ["info"] = "rbxassetid://10723415903",
+    ["code"] = "rbxassetid://10709810463",
+    ["bug"] = "rbxassetid://10709782845",
+    ["wrench"] = "rbxassetid://10747383470",
+    ["palette"] = "rbxassetid://10734910430",
+    ["brush"] = "rbxassetid://10709782758",
+    ["book"] = "rbxassetid://10709781824",
+    ["graduationcap"] = "rbxassetid://10723404691",
+    ["brain"] = "rbxassetid://10709782845",
+    ["flask"] = "rbxassetid://10734883986",
+    ["microscope"] = "rbxassetid://10734889106",
+    ["heartbeat"] = "rbxassetid://10723406795",
+    ["cross"] = "rbxassetid://10709818399",
+    ["eye"] = "rbxassetid://10723346959",
+    ["eyeoff"] = "rbxassetid://10723346871",
+    ["signal"] = "rbxassetid://10734961133",
+    ["power"] = "rbxassetid://10734930466",
+    ["lightning"] = "rbxassetid://10723345749",
+    ["snowflake"] = "rbxassetid://10734964600",
+    ["thermometer"] = "rbxassetid://10734983134",
+    ["waves"] = "rbxassetid://10747376931",
+    ["tornado"] = "rbxassetid://10734985247",
+    ["robot"] = "rbxassetid://10709782230",
+    ["apple"] = "rbxassetid://10709761889",
+    ["windows"] = "rbxassetid://10747364593",
+    ["chrome"] = "rbxassetid://10709797725",
+    ["html"] = "rbxassetid://10709810463",
+    ["python"] = "rbxassetid://10734930886",
+    ["database"] = "rbxassetid://10709818996",
+    ["network"] = "rbxassetid://10734906975",
+    ["firewall"] = "rbxassetid://10723376114",
+    ["password"] = "rbxassetid://10723416652",
+    ["barcode"] = "rbxassetid://10747360675",
+    ["faceid"] = "rbxassetid://10723375250",
+    ["dna"] = "rbxassetid://10723406795",
+    ["virus"] = "rbxassetid://10709782845",
+    ["atom"] = "rbxassetid://10709769598",
+    ["calculator"] = "rbxassetid://10709783311",
+    ["chart"] = "rbxassetid://10709773755",
+    ["wallet"] = "rbxassetid://10747376205",
+    ["bitcoin"] = "rbxassetid://10709776126",
+    ["stock"] = "rbxassetid://10747376205",
+    ["insurance"] = "rbxassetid://10734951847",
+    ["law"] = "rbxassetid://10734951847",
+    ["police"] = "rbxassetid://10734951847",
+    ["security"] = "rbxassetid://10734951847",
+    ["detective"] = "rbxassetid://10734951847",
+    ["camera"] = "rbxassetid://10709789686",
+    ["drone"] = "rbxassetid://10734934585",
+    ["satellite"] = "rbxassetid://10734941354",
+    ["radar"] = "rbxassetid://10734931596",
+    ["thermal"] = "rbxassetid://10734983134",
+    ["xray"] = "rbxassetid://10723346959",
+    ["vaccine"] = "rbxassetid://10734975932",
+    ["pill"] = "rbxassetid://10734975932",
+    ["diamond"] = "rbxassetid://10709819149",
+    ["gold"] = "rbxassetid://10723344432",
+    ["silver"] = "rbxassetid://10723344432",
+    ["gem"] = "rbxassetid://10723396000",
+    ["crown"] = "rbxassetid://10709818626",
+    ["medal"] = "rbxassetid://10734887072",
+    ["ticket"] = "rbxassetid://10734983868",
+    ["film"] = "rbxassetid://10723374981",
+    ["tv"] = "rbxassetid://10747364593",
+    ["gamepad"] = "rbxassetid://10723395457",
+    ["dice"] = "rbxassetid://10723343321",
+    ["chess"] = "rbxassetid://10723343416",
+    ["football"] = "rbxassetid://10723343537",
+    ["basketball"] = "rbxassetid://10723343636",
+    ["tennis"] = "rbxassetid://10723343737",
+    ["swimming"] = "rbxassetid://10723343805",
+    ["running"] = "rbxassetid://10723343958",
+    ["cycling"] = "rbxassetid://10723344088",
+    ["golf"] = "rbxassetid://10723344270",
+    ["yoga"] = "rbxassetid://10723344432",
+    ["gym"] = "rbxassetid://10723344737",
+    ["music"] = "rbxassetid://10734905958",
+    ["guitar"] = "rbxassetid://10723344885",
+    ["piano"] = "rbxassetid://10723345088",
+    ["mic"] = "rbxassetid://10734888864",
+    ["headphones"] = "rbxassetid://10723406165",
+    ["radio"] = "rbxassetid://10734931596",
+    ["podcast"] = "rbxassetid://10734929553",
+    ["cooking"] = "rbxassetid://10723345347",
+    ["restaurant"] = "rbxassetid://10723345518",
+    ["coffee"] = "rbxassetid://10709810814",
+    ["wine"] = "rbxassetid://10723345749",
+    ["beer"] = "rbxassetid://10709775167",
+    ["cocktail"] = "rbxassetid://10723345990",
+    ["pizza"] = "rbxassetid://10734922774",
+    ["burger"] = "rbxassetid://10723346158",
+    ["cake"] = "rbxassetid://10709783217",
+    ["icecream"] = "rbxassetid://10723414308",
+    ["carrot"] = "rbxassetid://10709789960",
+    ["apple"] = "rbxassetid://10709761889",
+    ["banana"] = "rbxassetid://10709770005",
+    ["grape"] = "rbxassetid://10723404822",
+    ["lemon"] = "rbxassetid://10723415642",
+    ["watermelon"] = "rbxassetid://10723415766",
+    ["pineapple"] = "rbxassetid://10723415903",
+    ["strawberry"] = "rbxassetid://10723416057",
+    ["cherry"] = "rbxassetid://10709790875",
+    ["peach"] = "rbxassetid://10723416195",
+    ["pear"] = "rbxassetid://10723416363",
+    ["orange"] = "rbxassetid://10723416527",
+    ["mango"] = "rbxassetid://10723416652",
+    ["avocado"] = "rbxassetid://10723416765",
+    ["broccoli"] = "rbxassetid://10723417513",
+    ["tomato"] = "rbxassetid://10723416922",
+    ["potato"] = "rbxassetid://10723417016",
+    ["onion"] = "rbxassetid://10723417131",
+    ["garlic"] = "rbxassetid://10723417240",
+    ["pepper"] = "rbxassetid://10723417356",
+    ["corn"] = "rbxassetid://10723417608",
+    ["rice"] = "rbxassetid://10723417703",
+    ["bread"] = "rbxassetid://10723423881",
+    ["cheese"] = "rbxassetid://10723417797",
+    ["egg"] = "rbxassetid://10723345518",
+    ["milk"] = "rbxassetid://10723424235",
+    ["honey"] = "rbxassetid://10723424058",
+    ["salt"] = "rbxassetid://10723424372",
+    ["sugar"] = "rbxassetid://10723424505",
+    ["spice"] = "rbxassetid://10723425376",
+    ["oil"] = "rbxassetid://10723424646",
+    ["vinegar"] = "rbxassetid://10723424838",
+    ["sauce"] = "rbxassetid://10723424963",
+    ["ketchup"] = "rbxassetid://10723425187",
+    ["mustard"] = "rbxassetid://10723425539",
+    ["mayo"] = "rbxassetid://10723425615",
+    ["butter"] = "rbxassetid://10723425685",
+    ["jam"] = "rbxassetid://10723425852",
+    ["nut"] = "rbxassetid://10723425762",
+    ["chocolate"] = "rbxassetid://10723426393",
+    ["candy"] = "rbxassetid://10723426722",
+    ["cookie"] = "rbxassetid://10709812067",
+    ["donut"] = "rbxassetid://10723426595",
+    ["cupcake"] = "rbxassetid://10723426513",
+    ["pie"] = "rbxassetid://10723433811",
+    ["pancake"] = "rbxassetid://10723426886",
+    ["waffle"] = "rbxassetid://10723426986",
+    ["toast"] = "rbxassetid://10723427081",
+    ["sandwich"] = "rbxassetid://10723427199",
+    ["salad"] = "rbxassetid://10723427334",
+    ["soup"] = "rbxassetid://10723427494",
+    ["noodles"] = "rbxassetid://10723427619",
+    ["pasta"] = "rbxassetid://10723433655",
+    ["sushi"] = "rbxassetid://10723434070",
+    ["taco"] = "rbxassetid://10723433935",
+    ["burrito"] = "rbxassetid://10723434236",
+    ["hotdog"] = "rbxassetid://10723434379",
+    ["fries"] = "rbxassetid://10723434557",
+    ["nuggets"] = "rbxassetid://10723434711",
+    ["steak"] = "rbxassetid://10723434830",
+    ["chicken"] = "rbxassetid://10723434906",
+    ["fish"] = "rbxassetid://10723434993",
+    ["shrimp"] = "rbxassetid://10723435069",
+    ["crab"] = "rbxassetid://10723435182",
+    ["lobster"] = "rbxassetid://10723435261",
+    ["octopus"] = "rbxassetid://10723435342",
+    ["squid"] = "rbxassetid://10723435443",
+    ["snail"] = "rbxassetid://10723435515",
+    ["frog"] = "rbxassetid://10723435614",
+    ["snake"] = "rbxassetid://10723435715",
+    ["lizard"] = "rbxassetid://10723435816",
+    ["turtle"] = "rbxassetid://10723435917",
+    ["crocodile"] = "rbxassetid://10723436018",
+    ["dinosaur"] = "rbxassetid://10723436119",
+    ["dragon"] = "rbxassetid://10723436220",
+    ["unicorn"] = "rbxassetid://10723436321",
+    ["phoenix"] = "rbxassetid://10723436422",
+    ["pegasus"] = "rbxassetid://10723436523",
+    ["mermaid"] = "rbxassetid://10723436624",
+    ["fairy"] = "rbxassetid://10723436725",
+    ["witch"] = "rbxassetid://10723436826",
+    ["wizard"] = "rbxassetid://10723436927",
+    ["ghost"] = "rbxassetid://10723396107",
+    ["vampire"] = "rbxassetid://10723437028",
+    ["werewolf"] = "rbxassetid://10723437129",
+    ["zombie"] = "rbxassetid://10723437230",
+    ["skeleton"] = "rbxassetid://10723437331",
+    ["mummy"] = "rbxassetid://10723437432",
+    ["frankenstein"] = "rbxassetid://10723437533",
+    ["alien"] = "rbxassetid://10709782845",
+    ["robot"] = "rbxassetid://10709782230",
+    ["cyborg"] = "rbxassetid://10723437634",
+    ["android"] = "rbxassetid://10709782230",
+    ["iphone"] = "rbxassetid://10723437735",
+    ["ipad"] = "rbxassetid://10723437836",
+    ["mac"] = "rbxassetid://10723437937",
+    ["windows"] = "rbxassetid://10747364593",
+    ["linux"] = "rbxassetid://10734982144",
+    ["chrome"] = "rbxassetid://10709797725",
+    ["firefox"] = "rbxassetid://10723376114",
+    ["safari"] = "rbxassetid://10747364761",
+    ["edge"] = "rbxassetid://10723344432",
+    ["opera"] = "rbxassetid://10734930886",
+    ["brave"] = "rbxassetid://10723438038",
+    ["tor"] = "rbxassetid://10723438139",
+    ["vpn"] = "rbxassetid://10723438240",
+    ["proxy"] = "rbxassetid://10723438341",
+    ["server"] = "rbxassetid://10734949856",
+    ["database"] = "rbxassetid://10709818996",
+    ["cloud"] = "rbxassetid://10709806740",
+    ["network"] = "rbxassetid://10734906975",
+    ["router"] = "rbxassetid://10734931596",
+    ["firewall"] = "rbxassetid://10723376114",
+    ["antivirus"] = "rbxassetid://10723438442",
+    ["malware"] = "rbxassetid://10723438543",
+    ["spyware"] = "rbxassetid://10723438644",
+    ["ransomware"] = "rbxassetid://10723438745",
+    ["phishing"] = "rbxassetid://10723438846",
+    ["hacking"] = "rbxassetid://10723438947",
+    ["coding"] = "rbxassetid://10709810463",
+    ["programming"] = "rbxassetid://10709810463",
+    ["debugging"] = "rbxassetid://10709782845",
+    ["testing"] = "rbxassetid://10723439048",
+    ["deploying"] = "rbxassetid://10723439149",
+    ["hosting"] = "rbxassetid://10723439250",
+    ["domain"] = "rbxassetid://10723439351",
+    ["website"] = "rbxassetid://10723439452",
+    ["blog"] = "rbxassetid://10723439553",
+    ["ecommerce"] = "rbxassetid://10723439654",
+    ["shopping"] = "rbxassetid://10734952479",
+    ["payment"] = "rbxassetid://10723439755",
+    ["invoice"] = "rbxassetid://10723439856",
+    ["receipt"] = "rbxassetid://10723439957",
+    ["refund"] = "rbxassetid://10723440058",
+    ["discount"] = "rbxassetid://10723440159",
+    ["coupon"] = "rbxassetid://10723440260",
+    ["voucher"] = "rbxassetid://10723440361",
+    ["giftcard"] = "rbxassetid://10723396402",
+    ["membership"] = "rbxassetid://10723440462",
+    ["subscription"] = "rbxassetid://10723440563",
+    ["premium"] = "rbxassetid://10723440664",
+    ["pro"] = "rbxassetid://10723440765",
+    ["enterprise"] = "rbxassetid://10723440866",
+    ["startup"] = "rbxassetid://10723440967",
+    ["business"] = "rbxassetid://10723441068",
+    ["marketing"] = "rbxassetid://10723441169",
+    ["advertising"] = "rbxassetid://10723441270",
+    ["seo"] = "rbxassetid://10723441371",
+    ["analytics"] = "rbxassetid://10723441472",
+    ["statistics"] = "rbxassetid://10723441573",
+    ["data"] = "rbxassetid://10709818996",
+    ["ai"] = "rbxassetid://10709782230",
+    ["ml"] = "rbxassetid://10709782230",
+    ["neural"] = "rbxassetid://10709782230",
+    ["blockchain"] = "rbxassetid://10709818996",
+    ["crypto"] = "rbxassetid://10709776126",
+    ["nft"] = "rbxassetid://10723441674",
+    ["metaverse"] = "rbxassetid://10723441775",
+    ["vr"] = "rbxassetid://10723441876",
+    ["ar"] = "rbxassetid://10723441977",
+    ["mr"] = "rbxassetid://10723442078",
+    ["xr"] = "rbxassetid://10723442179",
+    ["3d"] = "rbxassetid://10709769598",
+    ["animation"] = "rbxassetid://10723442280",
+    ["render"] = "rbxassetid://10723442381",
+    ["modeling"] = "rbxassetid://10723442482",
+    ["sculpting"] = "rbxassetid://10723442583",
+    ["texturing"] = "rbxassetid://10723442684",
+    ["lighting"] = "rbxassetid://10723442785",
+    ["compositing"] = "rbxassetid://10723442886",
+    ["editing"] = "rbxassetid://10734883598",
+    ["color"] = "rbxassetid://10723442987",
+    ["grading"] = "rbxassetid://10723443088",
+    ["sound"] = "rbxassetid://10723443189",
+    ["music"] = "rbxassetid://10734905958",
+    ["voice"] = "rbxassetid://10747375281",
+    ["effects"] = "rbxassetid://10723443290",
+    ["particles"] = "rbxassetid://10723443391",
+    ["physics"] = "rbxassetid://10723443492",
+    ["simulation"] = "rbxassetid://10723443593",
+    ["engine"] = "rbxassetid://10723443694",
+    ["game"] = "rbxassetid://10723395457",
+    ["level"] = "rbxassetid://10723443795",
+    ["character"] = "rbxassetid://10723443896",
+    ["avatar"] = "rbxassetid://10723443997",
+    ["skin"] = "rbxassetid://10723444098",
+    ["outfit"] = "rbxassetid://10723444199",
+    ["accessory"] = "rbxassetid://10709751939",
+    ["emote"] = "rbxassetid://10723444301",
+    ["dance"] = "rbxassetid://10723444402",
+    ["pose"] = "rbxassetid://10723444503",
+    ["expression"] = "rbxassetid://10723444604",
+    ["mood"] = "rbxassetid://10723444705",
+    ["personality"] = "rbxassetid://10723444806",
+    ["behavior"] = "rbxassetid://10723444907",
+    ["intelligence"] = "rbxassetid://10723445008",
+    ["emotion"] = "rbxassetid://10723445109",
+    ["feeling"] = "rbxassetid://10723445210",
+    ["thought"] = "rbxassetid://10723445311",
+    ["idea"] = "rbxassetid://10723445412",
+    ["concept"] = "rbxassetid://10723445513",
+    ["theory"] = "rbxassetid://10723445614",
+    ["principle"] = "rbxassetid://10723445715",
+    ["law"] = "rbxassetid://10734951847",
+    ["rule"] = "rbxassetid://10723445816",
+    ["regulation"] = "rbxassetid://10723445917",
+    ["policy"] = "rbxassetid://10723446018",
+    ["procedure"] = "rbxassetid://10723446119",
+    ["process"] = "rbxassetid://10723446220",
+    ["method"] = "rbxassetid://10723446321",
+    ["technique"] = "rbxassetid://10723446422",
+    ["strategy"] = "rbxassetid://10723446523",
+    ["tactic"] = "rbxassetid://10723446624",
+    ["plan"] = "rbxassetid://10723446725",
+    ["schedule"] = "rbxassetid://10723446826",
+    ["timeline"] = "rbxassetid://10723446927",
+    ["deadline"] = "rbxassetid://10723447028",
+    ["reminder"] = "rbxassetid://10723447129",
+    ["notification"] = "rbxassetid://10723447230",
+    ["alert"] = "rbxassetid://10709752996",
+    ["warning"] = "rbxassetid://10709753149",
+    ["error"] = "rbxassetid://10723447331",
+    ["bug"] = "rbxassetid://10709782845",
+    ["fix"] = "rbxassetid://10723447432",
+    ["patch"] = "rbxassetid://10723447533",
+    ["update"] = "rbxassetid://10723447634",
+    ["upgrade"] = "rbxassetid://10723447735",
+    ["downgrade"] = "rbxassetid://10723447836",
+    ["install"] = "rbxassetid://10723447937",
+    ["uninstall"] = "rbxassetid://10723448038",
+    ["download"] = "rbxassetid://10723344270",
+    ["upload"] = "rbxassetid://10747366434",
+    ["sync"] = "rbxassetid://10723448139",
+    ["backup"] = "rbxassetid://10723448240",
+    ["restore"] = "rbxassetid://10723448341",
+    ["recovery"] = "rbxassetid://10723448442",
+    ["reset"] = "rbxassetid://10723448543",
+    ["format"] = "rbxassetid://10723448644",
+    ["delete"] = "rbxassetid://10709819059",
+    ["remove"] = "rbxassetid://10723448745",
+    ["clear"] = "rbxassetid://10723448846",
+    ["clean"] = "rbxassetid://10723448947",
+    ["organize"] = "rbxassetid://10723449048",
+    ["sort"] = "rbxassetid://10723449149",
+    ["filter"] = "rbxassetid://10723375128",
+    ["search"] = "rbxassetid://10734943674",
+    ["find"] = "rbxassetid://10723449250",
+    ["locate"] = "rbxassetid://10723434557",
+    ["track"] = "rbxassetid://10723449351",
+    ["monitor"] = "rbxassetid://10734896881",
+    ["observe"] = "rbxassetid://10723449452",
+    ["watch"] = "rbxassetid://10747376722",
+    ["listen"] = "rbxassetid://10723449553",
+    ["hear"] = "rbxassetid://10723449654",
+    ["see"] = "rbxassetid://10723346959",
+    ["view"] = "rbxassetid://10747375132",
+    ["look"] = "rbxassetid://10723449755",
+    ["stare"] = "rbxassetid://10723449856",
+    ["glance"] = "rbxassetid://10723449957",
+    ["gaze"] = "rbxassetid://10723450058",
+    ["peek"] = "rbxassetid://10723450159",
+    ["spy"] = "rbxassetid://10723450260",
+    ["sneak"] = "rbxassetid://10723450361",
+    ["hide"] = "rbxassetid://10723450462",
+    ["show"] = "rbxassetid://10723450563",
+    ["reveal"] = "rbxassetid://10723450664",
+    ["expose"] = "rbxassetid://10723450765",
+    ["uncover"] = "rbxassetid://10723450866",
+    ["discover"] = "rbxassetid://10723450967",
+    ["find"] = "rbxassetid://10723449250",
+    ["locate"] = "rbxassetid://10723434557",
+    ["detect"] = "rbxassetid://10723451068",
+    ["identify"] = "rbxassetid://10723451169",
+    ["recognize"] = "rbxassetid://10723451270",
+    ["remember"] = "rbxassetid://10723451371",
+    ["forget"] = "rbxassetid://10723451472",
+    ["learn"] = "rbxassetid://10723451573",
+    ["study"] = "rbxassetid://10723451674",
+    ["teach"] = "rbxassetid://10723451775",
+    ["train"] = "rbxassetid://10747362105",
+    ["practice"] = "rbxassetid://10723451876",
+    ["exercise"] = "rbxassetid://10723451977",
+    ["workout"] = "rbxassetid://10723452078",
+    ["sport"] = "rbxassetid://10723452179",
+    ["game"] = "rbxassetid://10723395457",
+    ["play"] = "rbxassetid://10734923549",
+    ["fun"] = "rbxassetid://10723452280",
+    ["joy"] = "rbxassetid://10723452381",
+    ["happy"] = "rbxassetid://10723452482",
+    ["sad"] = "rbxassetid://10723452583",
+    ["angry"] = "rbxassetid://10709761629",
+    ["excited"] = "rbxassetid://10723452684",
+    ["bored"] = "rbxassetid://10723452785",
+    ["tired"] = "rbxassetid://10723452886",
+    ["sleepy"] = "rbxassetid://10723452987",
+    ["awake"] = "rbxassetid://10723453088",
+    ["alive"] = "rbxassetid://10723453189",
+    ["dead"] = "rbxassetid://10723453290",
+    ["ghost"] = "rbxassetid://10723396107",
+    ["zombie"] = "rbxassetid://10723437230",
+    ["vampire"] = "rbxassetid://10723437028",
+    ["werewolf"] = "rbxassetid://10723437129",
+    ["monster"] = "rbxassetid://10723453391",
+    ["creature"] = "rbxassetid://10723453492",
+    ["animal"] = "rbxassetid://10723453593",
+    ["pet"] = "rbxassetid://10723453694",
+    ["dog"] = "rbxassetid://10723453795",
+    ["cat"] = "rbxassetid://10723453896",
+    ["bird"] = "rbxassetid://10723453997",
+    ["fish"] = "rbxassetid://10723434993",
+    ["horse"] = "rbxassetid://10723454098",
+    ["cow"] = "rbxassetid://10723454199",
+    ["pig"] = "rbxassetid://10723454301",
+    ["sheep"] = "rbxassetid://10723454402",
+    ["goat"] = "rbxassetid://10723454503",
+    ["chicken"] = "rbxassetid://10723434906",
+    ["duck"] = "rbxassetid://10723454604",
+    ["turkey"] = "rbxassetid://10723454705",
+    ["rabbit"] = "rbxassetid://10723454806",
+    ["hamster"] = "rbxassetid://10723454907",
+    ["mouse"] = "rbxassetid://10734898592",
+    ["rat"] = "rbxassetid://10723455008",
+    ["snake"] = "rbxassetid://10723435715",
+    ["lizard"] = "rbxassetid://10723435816",
+    ["turtle"] = "rbxassetid://10723435917",
+    ["frog"] = "rbxassetid://10723435614",
+    ["crocodile"] = "rbxassetid://10723436018",
+    ["dinosaur"] = "rbxassetid://10723436119",
+    ["dragon"] = "rbxassetid://10723436220",
+    ["unicorn"] = "rbxassetid://10723436321",
+    ["phoenix"] = "rbxassetid://10723436422",
+    ["pegasus"] = "rbxassetid://10723436523",
+    ["mermaid"] = "rbxassetid://10723436624",
+    ["fairy"] = "rbxassetid://10723436725",
+    ["witch"] = "rbxassetid://10723436826",
+    ["wizard"] = "rbxassetid://10723436927",
+    ["elf"] = "rbxassetid://10723455109",
+    ["dwarf"] = "rbxassetid://10723455210",
+    ["giant"] = "rbxassetid://10723455311",
+    ["troll"] = "rbxassetid://10723455412",
+    ["orc"] = "rbxassetid://10723455513",
+    ["goblin"] = "rbxassetid://10723455614",
+    ["demon"] = "rbxassetid://10723455715",
+    ["angel"] = "rbxassetid://10723455816",
+    ["god"] = "rbxassetid://10723455917",
+    ["goddess"] = "rbxassetid://10723456018",
+    ["hero"] = "rbxassetid://10723456119",
+    ["villain"] = "rbxassetid://10723456220",
+    ["superhero"] = "rbxassetid://10723456321",
+    ["supervillain"] = "rbxassetid://10723456422",
+    ["mask"] = "rbxassetid://10723456523",
+    ["cape"] = "rbxassetid://10723456624",
+    ["sword"] = "rbxassetid://10734975486",
+    ["shield"] = "rbxassetid://10734951847",
+    ["armor"] = "rbxassetid://10723456725",
+    ["helmet"] = "rbxassetid://10723456826",
+    ["gloves"] = "rbxassetid://10723456927",
+    ["boots"] = "rbxassetid://10723457028",
+    ["ring"] = "rbxassetid://10723457129",
+    ["necklace"] = "rbxassetid://10723457230",
+    ["bracelet"] = "rbxassetid://10723457331",
+    ["earrings"] = "rbxassetid://10723457432",
+    ["watch"] = "rbxassetid://10747376722",
+    ["glasses"] = "rbxassetid://10723397895",
+    ["hat"] = "rbxassetid://10723457533",
+    ["scarf"] = "rbxassetid://10723457634",
+    ["jacket"] = "rbxassetid://10723457735",
+    ["shirt"] = "rbxassetid://10734952036",
+    ["pants"] = "rbxassetid://10723457836",
+    ["shoes"] = "rbxassetid://10723457937",
+    ["socks"] = "rbxassetid://10723458038",
+    ["underwear"] = "rbxassetid://10723458139",
+    ["swimsuit"] = "rbxassetid://10723458240",
+    ["uniform"] = "rbxassetid://10723458341",
+    ["costume"] = "rbxassetid://10723458442",
+    ["pajamas"] = "rbxassetid://10723458543",
+    ["robe"] = "rbxassetid://10723458644",
+    ["towel"] = "rbxassetid://10723458745",
+    ["blanket"] = "rbxassetid://10723458846",
+    ["pillow"] = "rbxassetid://10723458947",
+    ["bed"] = "rbxassetid://10709775036",
+    ["chair"] = "rbxassetid://10723459048",
+    ["table"] = "rbxassetid://10734976230",
+    ["desk"] = "rbxassetid://10723459149",
+    ["shelf"] = "rbxassetid://10723459250",
+    ["cabinet"] = "rbxassetid://10723459351",
+    ["drawer"] = "rbxassetid://10723459452",
+    ["closet"] = "rbxassetid://10723459553",
+    ["mirror"] = "rbxassetid://10723459654",
+    ["lamp"] = "rbxassetid://10723417513",
+    ["light"] = "rbxassetid://10723425852",
+    ["bulb"] = "rbxassetid://10723425852",
+    ["candle"] = "rbxassetid://10723459755",
+    ["fire"] = "rbxassetid://10723376114",
+    ["water"] = "rbxassetid://10723344432",
+    ["air"] = "rbxassetid://10723459856",
+    ["earth"] = "rbxassetid://10723459957",
+    ["fire"] = "rbxassetid://10723376114",
+    ["water"] = "rbxassetid://10723344432",
+    ["air"] = "rbxassetid://10723459856",
+    ["earth"] = "rbxassetid://10723459957",
+    ["metal"] = "rbxassetid://10723460058",
+    ["wood"] = "rbxassetid://10723460159",
+    ["stone"] = "rbxassetid://10723460260",
+    ["glass"] = "rbxassetid://10723397788",
+    ["plastic"] = "rbxassetid://10723460361",
+    ["rubber"] = "rbxassetid://10723460462",
+    ["fabric"] = "rbxassetid://10723460563",
+    ["leather"] = "rbxassetid://10723460664",
+    ["fur"] = "rbxassetid://10723460765",
+    ["feather"] = "rbxassetid://10723354671",
+    ["scale"] = "rbxassetid://10723460866",
+    ["shell"] = "rbxassetid://10723460967",
+    ["bone"] = "rbxassetid://10709781605",
+    ["blood"] = "rbxassetid://10723461068",
+    ["flesh"] = "rbxassetid://10723461169",
+    ["skin"] = "rbxassetid://10723444098",
+    ["hair"] = "rbxassetid://10723461270",
+    ["eye"] = "rbxassetid://10723346959",
+    ["ear"] = "rbxassetid://10723461371",
+    ["nose"] = "rbxassetid://10723461472",
+    ["mouth"] = "rbxassetid://10723461573",
+    ["tooth"] = "rbxassetid://10723461674",
+    ["tongue"] = "rbxassetid://10723461775",
+    ["lip"] = "rbxassetid://10723461876",
+    ["chin"] = "rbxassetid://10723461977",
+    ["cheek"] = "rbxassetid://10723462078",
+    ["forehead"] = "rbxassetid://10723462179",
+    ["eyebrow"] = "rbxassetid://10723462280",
+    ["eyelash"] = "rbxassetid://10723462381",
+    ["beard"] = "rbxassetid://10723462482",
+    ["mustache"] = "rbxassetid://10723462583",
+    ["arm"] = "rbxassetid://10723462684",
+    ["hand"] = "rbxassetid://10723405649",
+    ["finger"] = "rbxassetid://10723462785",
+    ["nail"] = "rbxassetid://10723462886",
+    ["leg"] = "rbxassetid://10723462987",
+    ["foot"] = "rbxassetid://10723463088",
+    ["toe"] = "rbxassetid://10723463189",
+    ["head"] = "rbxassetid://10723463290",
+    ["neck"] = "rbxassetid://10723463391",
+    ["shoulder"] = "rbxassetid://10723463492",
+    ["chest"] = "rbxassetid://10723463593",
+    ["back"] = "rbxassetid://10723463694",
+    ["stomach"] = "rbxassetid://10723463795",
+    ["waist"] = "rbxassetid://10723463896",
+    ["hip"] = "rbxassetid://10723463997",
+    ["thigh"] = "rbxassetid://10723464098",
+    ["knee"] = "rbxassetid://10723464199",
+    ["calf"] = "rbxassetid://10723464301",
+    ["ankle"] = "rbxassetid://10723464402",
+    ["heel"] = "rbxassetid://10723464503",
+    ["sole"] = "rbxassetid://10723464604",
+    ["brain"] = "rbxassetid://10709782845",
+    ["heart"] = "rbxassetid://10723406885",
+    ["lung"] = "rbxassetid://10723464705",
+    ["liver"] = "rbxassetid://10723464806",
+    ["kidney"] = "rbxassetid://10723464907",
+    ["stomach"] = "rbxassetid://10723463795",
+    ["intestine"] = "rbxassetid://10723465008",
+    ["vein"] = "rbxassetid://10723465109",
+    ["artery"] = "rbxassetid://10723465210",
+    ["nerve"] = "rbxassetid://10723465311",
+    ["muscle"] = "rbxassetid://10723465412",
+    ["bone"] = "rbxassetid://10709781605",
+    ["skin"] = "rbxassetid://10723444098",
+    ["hair"] = "rbxassetid://10723461270",
+    ["nail"] = "rbxassetid://10723462886",
+    ["tooth"] = "rbxassetid://10723461674",
+    ["eye"] = "rbxassetid://10723346959",
+    ["ear"] = "rbxassetid://10723461371",
+    ["nose"] = "rbxassetid://10723461472",
+    ["mouth"] = "rbxassetid://10723461573",
+    ["tongue"] = "rbxassetid://10723461775",
+    ["lip"] = "rbxassetid://10723461876",
+    ["chin"] = "rbxassetid://10723461977",
+    ["cheek"] = "rbxassetid://10723462078",
+    ["forehead"] = "rbxassetid://10723462179",
+    ["eyebrow"] = "rbxassetid://10723462280",
+    ["eyelash"] = "rbxassetid://10723462381",
+    ["beard"] = "rbxassetid://10723462482",
+    ["mustache"] = "rbxassetid://10723462583",
+    ["arm"] = "rbxassetid://10723462684",
+    ["hand"] = "rbxassetid://10723405649",
+    ["finger"] = "rbxassetid://10723462785",
+    ["nail"] = "rbxassetid://10723462886",
+    ["leg"] = "rbxassetid://10723462987",
+    ["foot"] = "rbxassetid://10723463088",
+    ["toe"] = "rbxassetid://10723463189",
+    ["head"] = "rbxassetid://10723463290",
+    ["neck"] = "rbxassetid://10723463391",
+    ["shoulder"] = "rbxassetid://10723463492",
+    ["chest"] = "rbxassetid://10723463593",
+    ["back"] = "rbxassetid://10723463694",
+    ["stomach"] = "rbxassetid://10723463795",
+    ["waist"] = "rbxassetid://10723463896",
+    ["hip"] = "rbxassetid://10723463997",
+    ["thigh"] = "rbxassetid://10723464098",
+    ["knee"] = "rbxassetid://10723464199",
+    ["calf"] = "rbxassetid://10723464301",
+    ["ankle"] = "rbxassetid://10723464402",
+    ["heel"] = "rbxassetid://10723464503",
+    ["sole"] = "rbxassetid://10723464604",
+    ["brain"] = "rbxassetid://10709782845",
+    ["heart"] = "rbxassetid://10723406885",
+    ["lung"] = "rbxassetid://10723464705",
+    ["liver"] = "rbxassetid://10723464806",
+    ["kidney"] = "rbxassetid://10723464907",
+    ["stomach"] = "rbxassetid://10723463795",
+    ["intestine"] = "rbxassetid://10723465008",
+    ["vein"] = "rbxassetid://10723465109",
+    ["artery"] = "rbxassetid://10723465210",
+    ["nerve"] = "rbxassetid://10723465311",
+    ["muscle"] = "rbxassetid://10723465412",
+    ["bone"] = "rbxassetid://10709781605",
+    ["skin"] = "rbxassetid://10723444098",
+    ["hair"] = "rbxassetid://10723461270",
+    ["nail"] = "rbxassetid://10723462886",
+    ["tooth"] = "rbxassetid://10723461674",
+    ["eye"] = "rbxassetid://10723346959",
+    ["ear"] = "rbxassetid://10723461371",
+    ["nose"] = "rbxassetid://10723461472",
+    ["mouth"] = "rbxassetid://10723461573",
+    ["tongue"] = "rbxassetid://10723461775",
+    ["lip"] = "rbxassetid://10723461876",
+    ["chin"] = "rbxassetid://10723461977",
+    ["cheek"] = "rbxassetid://10723462078",
+    ["forehead"] = "rbxassetid://10723462179",
+    ["eyebrow"] = "rbxassetid://10723462280",
+    ["eyelash"] = "rbxassetid://10723462381",
+    ["beard"] = "rbxassetid://10723462482",
+    ["mustache"] = "rbxassetid://10723462583",
+    ["arm"] = "rbxassetid://10723462684",
+    ["hand"] = "rbxassetid://10723405649",
+    ["finger"] = "rbxassetid://10723462785",
+    ["nail"] = "rbxassetid://10723462886",
+    ["leg"] = "rbxassetid://10723462987",
+    ["foot"] = "rbxassetid://10723463088",
+    ["toe"] = "rbxassetid://10723463189",
+    ["head"] = "rbxassetid://10723463290",
+    ["neck"] = "rbxassetid://10723463391",
+    ["shoulder"] = "rbxassetid://10723463492",
+    ["chest"] = "rbxassetid://10723463593",
+    ["back"] = "rbxassetid://10723463694",
+    ["stomach"] = "rbxassetid://10723463795",
+    ["waist"] = "rbxassetid://10723463896",
+    ["hip"] = "rbxassetid://10723463997",
+    ["thigh"] = "rbxassetid://10723464098",
+    ["knee"] = "rbxassetid://10723464199",
+    ["calf"] = "rbxassetid://10723464301",
+    ["ankle"] = "rbxassetid://10723464402",
+    ["heel"] = "rbxassetid://10723464503",
+    ["sole"] = "rbxassetid://10723464604"
+}
+
+-- Utility Functions
+local Utils = {}
+
+function Utils.Create(class, properties)
+    local obj = Instance.new(class)
+    for prop, value in pairs(properties) do
+        obj[prop] = value
+    end
+    return obj
+end
+
+function Utils.Tween(object, properties, duration, easingStyle, easingDirection)
+    local tweenInfo = TweenInfo.new(
+        duration or Theme.Animations.Duration,
+        easingStyle or Theme.Animations.Easing,
+        easingDirection or Theme.Animations.Direction,
+        0,
+        false,
+        0
+    )
+    local tween = TweenService:Create(object, tweenInfo, properties)
+    tween:Play()
+    return tween
+end
+
+function Utils.CreateRoundedFrame(properties)
+    local frame = Utils.Create("Frame", properties)
+    local corner = Utils.Create("UICorner", {
+        CornerRadius = UDim.new(0, properties.CornerRadius or Theme.CornerRadius.Medium)
+    })
+    corner.Parent = frame
+    return frame
+end
+
+function Utils.CreateIcon(iconName, size, color, parent)
+    if Icons[iconName] then
+        local icon = Utils.Create("ImageLabel", {
+            Name = iconName .. "Icon",
+            Image = Icons[iconName],
+            ImageColor3 = color or Theme.Colors.Text,
+            BackgroundTransparency = 1,
+            Size = size or UDim2.new(0, 24, 0, 24),
+            ImageTransparency = 0
+        })
+        if parent then icon.Parent = parent end
+        return icon
+    end
+    return nil
+end
+
+function Utils.CreateGlassEffect(parent)
+    local frame = Utils.Create("Frame", {
+        Name = "GlassEffect",
+        BackgroundTransparency = Theme.Transparencies.Glass,
+        BackgroundColor3 = Theme.Colors.Glass,
+        Size = UDim2.new(1, 0, 1, 0),
+        ZIndex = 0
+    })
+    
+    local uicorner = Utils.Create("UICorner", {
+        CornerRadius = UDim.new(0, Theme.CornerRadius.Large)
+    })
+    uicorner.Parent = frame
+    
+    local uistroke = Utils.Create("UIStroke", {
+        Color = Theme.Colors.Glass,
+        Transparency = 0.9,
+        Thickness = 1.5,
+        ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+    })
+    uistroke.Parent = frame
+    
+    frame.Parent = parent
+    return frame
+end
+
+function Utils.CreateHoverEffect(button)
+    button.MouseEnter:Connect(function()
+        Utils.Tween(button, {BackgroundTransparency = button.BackgroundTransparency - 0.15})
+    end)
+    
+    button.MouseLeave:Connect(function()
+        Utils.Tween(button, {BackgroundTransparency = button.BackgroundTransparency + 0.15})
+    end)
+end
+
+function Utils.SaveConfig(name, data)
+    local success, result = pcall(function()
+        local json = HttpService:JSONEncode(data)
+        if isfolder and makefolder and writefile then
+            if not isfolder(CONFIG_FOLDER) then
+                makefolder(CONFIG_FOLDER)
+            end
+            writefile(CONFIG_FOLDER .. "/" .. name .. ".json", json)
+        else
+            local DataStoreService = game:GetService("DataStoreService")
+            local store = DataStoreService:GetDataStore(CONFIG_FOLDER)
+            store:SetAsync(name, data)
+        end
+    end)
+    return success
+end
+
+function Utils.LoadConfig(name)
+    local success, result = pcall(function()
+        if isfolder and readfile then
+            if isfolder(CONFIG_FOLDER) then
+                local path = CONFIG_FOLDER .. "/" .. name .. ".json"
+                if readfile and isfile and isfile(path) then
+                    local json = readfile(path)
+                    return HttpService:JSONDecode(json)
+                end
+            end
+        else
+            local DataStoreService = game:GetService("DataStoreService")
+            local store = DataStoreService:GetDataStore(CONFIG_FOLDER)
+            return store:GetAsync(name)
+        end
+    end)
+    return success and result or {}
+end
+
+function Utils.GetTextDirection(language)
+    return language == "AR" and Enum.TextXAlignment.Right or Enum.TextXAlignment.Left
+end
+
+function Utils.GetHorizontalAlignment(language)
+    return language == "AR" and Enum.HorizontalAlignment.Right or Enum.HorizontalAlignment.Left
+end
+
+function Utils.GetFont(language)
+    return language == "AR" and Theme.Fonts.Arabic or Theme.Fonts.English
+end
+
+-- Animation System
+local Animations = {
+    Pulse = function(object)
+        local originalSize = object.Size
+        local tween = Utils.Tween(object, {Size = originalSize + UDim2.new(0, 5, 0, 5)}, 0.2)
+        tween.Completed:Connect(function()
+            Utils.Tween(object, {Size = originalSize}, 0.2)
+        end)
+    end,
+    
+    Shake = function(object)
+        local originalPosition = object.Position
+        for i = 1, 3 do
+            Utils.Tween(object, {Position = originalPosition + UDim2.new(0, 3, 0, 0)}, 0.05)
+            wait(0.05)
+            Utils.Tween(object, {Position = originalPosition - UDim2.new(0, 3, 0, 0)}, 0.05)
+            wait(0.05)
+        end
+        Utils.Tween(object, {Position = originalPosition}, 0.1)
+    end,
+    
+    FadeIn = function(object)
+        object.Visible = true
+        Utils.Tween(object, {BackgroundTransparency = object.BackgroundTransparency - 0.1})
+    end,
+    
+    FadeOut = function(object)
+        local tween = Utils.Tween(object, {BackgroundTransparency = 1})
+        tween.Completed:Connect(function()
+            object.Visible = false
+        end)
+    end,
+    
+    ScaleIn = function(object)
+        object.Visible = true
+        object.Scale = 0
+        Utils.Tween(object, {Scale = 1}, 0.3, Enum.EasingStyle.Back, Enum.EasingDirection.Out)
+    end,
+    
+    ScaleOut = function(object)
+        local tween = Utils.Tween(object, {Scale = 0}, 0.3, Enum.EasingStyle.Back, Enum.EasingDirection.In)
+        tween.Completed:Connect(function()
+            object.Visible = false
+        end)
+    end
+}
+
+-- Core Components Factory
+local Components = {}
+
+-- Register System for Custom Components
+UltimateUI.RegisteredComponents = {}
+
+function UltimateUI:RegisterComponent(name, componentFunction)
+    self.RegisteredComponents[name] = componentFunction
+end
+
+-- Window System
+function UltimateUI:MakeWindow(config)
+    config = config or {}
+    
+    -- Create ScreenGui
+    local screenGui = Utils.Create("ScreenGui", {
+        Name = SCREEN_GUI_NAME,
+        DisplayOrder = 100,
+        ResetOnSpawn = false,
+        IgnoreGuiInset = true
+    })
+    
+    -- Main Container
+    local container = Utils.Create("Frame", {
+        Name = "Container",
+        Size = UDim2.new(1, 0, 1, 0),
+        BackgroundTransparency = 1,
+        ClipsDescendants = true
+    })
+    
+    -- Main Window Frame
+    local window = Utils.Create("Frame", {
+        Name = "Window",
+        Size = UDim2.new(0, config.Width or 520, 0, config.Height or 420),
+        Position = UDim2.new(0.5, 0, 0.5, 0),
+        AnchorPoint = Vector2.new(0.5, 0.5),
+        BackgroundColor3 = Theme.Colors.Primary,
+        BackgroundTransparency = Theme.Transparencies.Window,
+        ClipsDescendants = true,
+        Active = true
+    })
+    
+    -- Glass Effect
+    Utils.CreateGlassEffect(window)
+    
+    -- Window Corner
+    local windowCorner = Utils.Create("UICorner", {
+        CornerRadius = UDim.new(0, Theme.CornerRadius.Large)
+    })
+    windowCorner.Parent = window
+    
+    -- Window Stroke
+    local windowStroke = Utils.Create("UIStroke", {
+        Color = Theme.Colors.Accent,
+        Transparency = 0.4,
+        Thickness = 2,
+        ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+    })
+    windowStroke.Parent = window
+    
+    -- Header
+    local header = Utils.Create("Frame", {
+        Name = "Header",
+        Size = UDim2.new(1, 0, 0, 65),
+        BackgroundColor3 = Theme.Colors.Secondary,
+        BackgroundTransparency = Theme.Transparencies.Header,
+        BorderSizePixel = 0
+    })
+    
+    local headerCorner = Utils.Create("UICorner", {
+        CornerRadius = UDim.new(0, Theme.CornerRadius.Large, 0, 0)
+    })
+    headerCorner.Parent = header
+    
+    -- Title and Subtitle Container
+    local titleContainer = Utils.Create("Frame", {
+        Size = UDim2.new(1, -140, 1, 0),
+        BackgroundTransparency = 1
+    })
+    
+    -- Title with Icon
+    local titleIcon = Utils.CreateIcon("activity", UDim2.new(0, 26, 0, 26), Theme.Colors.Accent, titleContainer)
+    titleIcon.Position = UDim2.new(0, 15, 0, 15)
+    
+    local title = Utils.Create("TextLabel", {
+        Name = "Title",
+        Text = config.Title or "Ultimate UI",
+        TextColor3 = Theme.Colors.Text,
+        TextSize = 24,
+        Font = Utils.GetFont(config.Language),
+        TextXAlignment = Utils.GetTextDirection(config.Language),
+        BackgroundTransparency = 1,
+        Position = UDim2.new(0, 50, 0, 12),
+        Size = UDim2.new(1, -60, 0, 30),
+        TextStrokeTransparency = 0.8,
+        TextStrokeColor3 = Theme.Colors.Primary
+    })
+    title.Parent = titleContainer
+    
+    local subtitle = Utils.Create("TextLabel", {
+        Name = "SubTitle",
+        Text = config.SubTitle or "Professional UI Framework",
+        TextColor3 = Theme.Colors.SubText,
+        TextSize = 14,
+        Font = Utils.GetFont(config.Language),
+        TextXAlignment = Utils.GetTextDirection(config.Language),
+        BackgroundTransparency = 1,
+        Position = UDim2.new(0, 50, 0, 40),
+        Size = UDim2.new(1, -60, 0, 20)
+    })
+    subtitle.Parent = titleContainer
+    
+    titleContainer.Parent = header
+    
+    -- Control Buttons
+    local controls = Utils.Create("Frame", {
+        Size = UDim2.new(0, 100, 1, 0),
+        Position = UDim2.new(1, -10, 0, 0),
+        AnchorPoint = Vector2.new(1, 0),
+        BackgroundTransparency = 1
+    })
+    
+    -- Minimize Button
+    local minimizeBtn = Utils.Create("ImageButton", {
+        Name = "Minimize",
+        Image = Icons["minuscircle"],
+        ImageColor3 = Theme.Colors.Text,
+        BackgroundColor3 = Theme.Colors.Accent,
+        BackgroundTransparency = 0.7,
+        Size = UDim2.new(0, 30, 0, 30),
+        Position = UDim2.new(0, 5, 0.5, 0),
+        AnchorPoint = Vector2.new(0, 0.5),
+        AutoButtonColor = false
+    })
+    Utils.Create("UICorner", {CornerRadius = UDim.new(1, 0)}).Parent = minimizeBtn
+    Utils.CreateHoverEffect(minimizeBtn)
+    
+    -- Close Button
+    local closeBtn = Utils.Create("ImageButton", {
+        Name = "Close",
+        Image = Icons["xcircle"],
+        ImageColor3 = Theme.Colors.Text,
+        BackgroundColor3 = Theme.Colors.Error,
+        BackgroundTransparency = 0.7,
+        Size = UDim2.new(0, 30, 0, 30),
+        Position = UDim2.new(1, -5, 0.5, 0),
+        AnchorPoint = Vector2.new(1, 0.5),
+        AutoButtonColor = false
+    })
+    Utils.Create("UICorner", {CornerRadius = UDim.new(1, 0)}).Parent = closeBtn
+    Utils.CreateHoverEffect(closeBtn)
+    
+    minimizeBtn.Parent = controls
+    closeBtn.Parent = controls
+    controls.Parent = header
+    
+    -- Content Area
+    local content = Utils.Create("Frame", {
+        Name = "Content",
+        Size = UDim2.new(1, 0, 1, -65),
+        Position = UDim2.new(0, 0, 0, 65),
+        BackgroundTransparency = 1
+    })
+    
+    -- Tabs Container
+    local tabsContainer = Utils.Create("Frame", {
+        Name = "Tabs",
+        Size = UDim2.new(1, -30, 0, 40),
+        Position = UDim2.new(0, 15, 0, 10),
+        BackgroundTransparency = 1
+    })
+    
+    local tabsListLayout = Utils.Create("UIListLayout", {
+        FillDirection = Enum.FillDirection.Horizontal,
+        HorizontalAlignment = Utils.GetHorizontalAlignment(config.Language),
+        SortOrder = Enum.SortOrder.LayoutOrder,
+        Padding = UDim.new(0, 8)
+    })
+    tabsListLayout.Parent = tabsContainer
+    
+    -- Pages Container
+    local pagesContainer = Utils.Create("Frame", {
+        Name = "Pages",
+        Size = UDim2.new(1, -30, 1, -65),
+        Position = UDim2.new(0, 15, 0, 60),
+        BackgroundTransparency = 1,
+        ClipsDescendants = true
+    })
+    
+    -- Assemble Window
+    header.Parent = window
+    content.Parent = window
+    tabsContainer.Parent = content
+    pagesContainer.Parent = content
+    window.Parent = container
+    container.Parent = screenGui
+    
+    -- Window Dragging
+    local dragging = false
+    local dragStart, windowStart
+    
+    header.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 then
+            dragging = true
+            dragStart = input.Position
+            windowStart = window.Position
+            Utils.Tween(window, {BackgroundTransparency = 0.02})
+        end
+    end)
+    
+    header.InputEnded:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 then
+            dragging = false
+            Utils.Tween(window, {BackgroundTransparency = Theme.Transparencies.Window})
+        end
+    end)
+    
+    UserInputService.InputChanged:Connect(function(input)
+        if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
+            local delta = input.Position - dragStart
+            window.Position = UDim2.new(
+                windowStart.X.Scale,
+                windowStart.X.Offset + delta.X,
+                windowStart.Y.Scale,
+                windowStart.Y.Offset + delta.Y
+            )
+        end
+    end)
+    
+    -- Minimize Functionality
+    local isMinimized = false
+    local originalSize = window.Size
+    
+    minimizeBtn.MouseButton1Click:Connect(function()
+        Animations.Pulse(minimizeBtn)
+        isMinimized = not isMinimized
+        if isMinimized then
+            Utils.Tween(window, {Size = UDim2.new(originalSize.X.Scale, originalSize.X.Offset, 0, 65)})
+            minimizeBtn.Image = Icons["pluscircle"]
+        else
+            Utils.Tween(window, {Size = originalSize})
+            minimizeBtn.Image = Icons["minuscircle"]
+        end
+    end)
+    
+    -- Close Functionality
+    closeBtn.MouseButton1Click:Connect(function()
+        Animations.Pulse(closeBtn)
+        Animations.ScaleOut(window)
+        wait(0.3)
+        screenGui:Destroy()
+    end)
+    
+    -- Mobile Scaling
+    if RunService:IsMobile() then
+        local uiScale = Utils.Create("UIScale", {Scale = 0.8})
+        uiScale.Parent = window
+    end
+    
+    -- Keybind for Show/Hide
+    local isVisible = true
+    UserInputService.InputBegan:Connect(function(input, gameProcessed)
+        if not gameProcessed and input.KeyCode == Enum.KeyCode.RightShift then
+            isVisible = not isVisible
+            screenGui.Enabled = isVisible
+            if isVisible then
+                Animations.FadeIn(window)
+            else
+                Animations.FadeOut(window)
+            end
+        end
+    end)
+    
+    -- Parent to PlayerGui
+    screenGui.Parent = Players.LocalPlayer:WaitForChild("PlayerGui")
+    
+    -- Window Object
+    local windowObj = {
+        Gui = screenGui,
+        Window = window,
+        Content = content,
+        TabsContainer = tabsContainer,
+        PagesContainer = pagesContainer,
+        Language = config.Language or "EN",
+        SaveFolder = config.SaveFolder or "Config.json",
+        Tabs = {},
+        Flags = {},
+        Config = {}
+    }
+    
+    -- Load Saved Config
+    spawn(function()
+        wait(0.5)
+        local savedConfig = Utils.LoadConfig(windowObj.SaveFolder)
+        if savedConfig then
+            windowObj.Config = savedConfig
+        end
+    end)
+    
+    -- Save Config on Close
+    window.Destroying:Connect(function()
+        Utils.SaveConfig(windowObj.SaveFolder, windowObj.Config)
+    end)
+    
+    -- Tab Creation Method
+    function windowObj:AddTab(name, icon)
+        return self:CreateTab(name, icon)
+    end
+    
+    -- Tab Creation Internal
+    function windowObj:CreateTab(name, icon)
+        -- Tab Button
+        local tabButton = Utils.Create("TextButton", {
+            Name = name,
+            Text = "",
+            BackgroundColor3 = Theme.Colors.Secondary,
+            BackgroundTransparency = 0.8,
+            Size = UDim2.new(0, 110, 1, 0),
+            AutoButtonColor = false,
+            LayoutOrder = #self.Tabs + 1
+        })
+        
+        local buttonCorner = Utils.Create("UICorner", {
+            CornerRadius = UDim.new(0, Theme.CornerRadius.Small)
+        })
+        buttonCorner.Parent = tabButton
+        
+        local buttonStroke = Utils.Create("UIStroke", {
+            Color = Theme.Colors.Accent,
+            Transparency = 0.8,
+            Thickness = 1.5
+        })
+        buttonStroke.Parent = tabButton
+        
+        -- Tab Icon
+        local tabIcon = Utils.CreateIcon(icon or "settings", UDim2.new(0, 18, 0, 18), Theme.Colors.Text, tabButton)
+        tabIcon.Position = UDim2.new(0, 12, 0.5, 0)
+        tabIcon.AnchorPoint = Vector2.new(0, 0.5)
+        
+        -- Tab Label
+        local label = Utils.Create("TextLabel", {
+            Text = name,
+            TextColor3 = Theme.Colors.Text,
+            TextSize = 13,
+            Font = Utils.GetFont(self.Language),
+            TextXAlignment = Utils.GetTextDirection(self.Language),
+            BackgroundTransparency = 1,
+            Position = UDim2.new(0, 38, 0, 0),
+            Size = UDim2.new(1, -45, 1, 0)
+        })
+        label.Parent = tabButton
+        
+        -- Tab Page
+        local page = Utils.Create("ScrollingFrame", {
+            Name = name .. "_Page",
+            Size = UDim2.new(1, 0, 1, 0),
+            BackgroundTransparency = 1,
+            ScrollBarThickness = 4,
+            ScrollBarImageColor3 = Theme.Colors.Accent,
+            ScrollBarImageTransparency = 0.6,
+            CanvasSize = UDim2.new(0, 0, 0, 0),
+            Visible = false
+        })
+        
+        local pageListLayout = Utils.Create("UIListLayout", {
+            SortOrder = Enum.SortOrder.LayoutOrder,
+            Padding = UDim.new(0, 12)
+        })
+        pageListLayout.Parent = page
+        
+        pageListLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
+            page.CanvasSize = UDim2.new(0, 0, 0, pageListLayout.AbsoluteContentSize.Y + 20)
+        end)
+        
+        -- Tab Selection
+        local function selectTab()
+            -- Hide all pages
+            for _, existingPage in pairs(self.PagesContainer:GetChildren()) do
+                if existingPage:IsA("ScrollingFrame") then
+                    existingPage.Visible = false
+                end
+            end
+            
+            -- Reset all tabs
+            for _, existingTab in pairs(self.TabsContainer:GetChildren()) do
+                if existingTab:IsA("TextButton") then
+                    Utils.Tween(existingTab, {BackgroundTransparency = 0.8})
+                    Utils.Tween(existingTab.UIStroke, {Transparency = 0.8})
+                end
+            end
+            
+            -- Show selected page
+            page.Visible = true
+            Utils.Tween(tabButton, {BackgroundTransparency = 0.4})
+            Utils.Tween(tabButton.UIStroke, {Transparency = 0.2})
+            Animations.Pulse(tabButton)
+        end
+        
+        Utils.CreateHoverEffect(tabButton)
+        tabButton.MouseButton1Click:Connect(selectTab)
+        
+        -- Add to window
+        tabButton.Parent = self.TabsContainer
+        page.Parent = self.PagesContainer
+        
+        -- Select first tab
+        if #self.TabsContainer:GetChildren() == 1 then
+            selectTab()
+        end
+        
+        -- Tab Object
+        local tabObj = {
+            Button = tabButton,
+            Page = page,
+            Window = self,
+            Elements = {},
+            Flags = {}
+        }
+        
+        -- Section Creation Method
+        function tabObj:AddSection(name, icon)
+            local section = Utils.Create("Frame", {
+                Name = "Section_" .. name,
+                Size = UDim2.new(1, 0, 0, 0),
+                BackgroundColor3 = Theme.Colors.Secondary,
+                BackgroundTransparency = 0.85,
+                LayoutOrder = #self.Page:GetChildren() + 1
+            })
+            
+            local corner = Utils.Create("UICorner", {
+                CornerRadius = UDim.new(0, Theme.CornerRadius.Medium)
+            })
+            corner.Parent = section
+            
+            local stroke = Utils.Create("UIStroke", {
+                Color = Theme.Colors.Accent,
+                Transparency = 0.6,
+                Thickness = 1.5
+            })
+            stroke.Parent = section
+            
+            -- Header
+            local header = Utils.Create("Frame", {
+                Size = UDim2.new(1, 0, 0, 40),
+                BackgroundTransparency = 1
+            })
+            
+            -- Icon
+            local sectionIcon = Utils.CreateIcon(icon or "settings", UDim2.new(0, 20, 0, 20), Theme.Colors.Accent, header)
+            sectionIcon.Position = UDim2.new(0, 12, 0.5, 0)
+            sectionIcon.AnchorPoint = Vector2.new(0, 0.5)
+            
+            -- Title
+            local title = Utils.Create("TextLabel", {
+                Text = name,
+                TextColor3 = Theme.Colors.Text,
+                TextSize = 16,
+                Font = Theme.Fonts.English,
+                TextXAlignment = Enum.TextXAlignment.Left,
+                BackgroundTransparency = 1,
+                Position = UDim2.new(0, 40, 0, 0),
+                Size = UDim2.new(1, -50, 1, 0)
+            })
+            title.Parent = header
+            
+            -- Divider
+            local divider = Utils.Create("Frame", {
+                Size = UDim2.new(1, -20, 0, 1),
+                Position = UDim2.new(0, 10, 1, 0),
+                BackgroundColor3 = Theme.Colors.Accent,
+                BackgroundTransparency = 0.7
+            })
+            divider.Parent = header
+            
+            -- Container
+            local container = Utils.Create("Frame", {
+                Name = "Container",
+                Size = UDim2.new(1, -20, 1, -50),
+                Position = UDim2.new(0, 10, 0, 50),
+                BackgroundTransparency = 1
+            })
+            
+            local listLayout = Utils.Create("UIListLayout", {
+                SortOrder = Enum.SortOrder.LayoutOrder,
+                Padding = UDim.new(0, 10)
+            })
+            listLayout.Parent = container
+            
+            listLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
+                section.Size = UDim2.new(1, 0, 0, listLayout.AbsoluteContentSize.Y + 60)
+            end)
+            
+            header.Parent = section
+            container.Parent = section
+            section.Parent = self.Page
+            
+            local sectionObj = {
+                Frame = section,
+                Container = container,
+                Tab = self
+            }
+            
+            -- Component Methods
+            function sectionObj:AddButton(config)
+                config = config or {}
+                local button = Utils.Create("TextButton", {
+                    Name = "Button_" .. config.Title,
+                    Text = config.Title or "Button",
+                    TextColor3 = Theme.Colors.Text,
+                    TextSize = 14,
+                    Font = Theme.Fonts.English,
+                    BackgroundColor3 = Theme.Colors.Accent,
+                    BackgroundTransparency = 0.2,
+                    Size = UDim2.new(1, 0, 0, 38),
+                    LayoutOrder = #self.Container:GetChildren() + 1,
+                    AutoButtonColor = false
+                })
+                
+                local uicorner = Utils.Create("UICorner", {
+                    CornerRadius = UDim.new(0, Theme.CornerRadius.Small)
+                })
+                uicorner.Parent = button
+                
+                local uistroke = Utils.Create("UIStroke", {
+                    Color = Theme.Colors.Text,
+                    Transparency = 0.5,
+                    Thickness = 1
+                })
+                uistroke.Parent = button
+                
+                -- Icon if provided
+                if config.Icon then
+                    local icon = Utils.CreateIcon(config.Icon, UDim2.new(0, 18, 0, 18), Theme.Colors.Text, button)
+                    icon.Position = UDim2.new(0, 10, 0.5, 0)
+                    icon.AnchorPoint = Vector2.new(0, 0.5)
+                    button.TextXAlignment = Enum.TextXAlignment.Center
+                end
+                
+                -- Hover effects
+                Utils.CreateHoverEffect(button)
+                button.MouseEnter:Connect(function()
+                    Utils.Tween(button, {TextColor3 = Theme.Colors.Primary})
+                end)
+                
+                button.MouseLeave:Connect(function()
+                    Utils.Tween(button, {TextColor3 = Theme.Colors.Text})
+                end)
+                
+                -- Click animation and callback
+                button.MouseButton1Click:Connect(function()
+                    Animations.Pulse(button)
+                    if config.Callback then
+                        config.Callback()
+                    end
+                end)
+                
+                button.Parent = self.Container
+                
+                return {
+                    Button = button,
+                    SetText = function(text) button.Text = text end,
+                    SetVisible = function(visible) button.Visible = visible end
+                }
+            end
+            
+            function sectionObj:AddToggle(config)
+                config = config or {}
+                local toggle = Utils.Create("Frame", {
+                    Name = "Toggle_" .. config.Title,
+                    Size = UDim2.new(1, 0, 0, 38),
+                    BackgroundTransparency = 1,
+                    LayoutOrder = #self.Container:GetChildren() + 1
+                })
+                
+                -- Icon
+                local toggleIcon = Utils.CreateIcon(config.Icon or "toggleleft", UDim2.new(0, 20, 0, 20), Theme.Colors.SubText, toggle)
+                toggleIcon.Position = UDim2.new(0, 8, 0.5, 0)
+                toggleIcon.AnchorPoint = Vector2.new(0, 0.5)
+                
+                -- Label
+                local label = Utils.Create("TextLabel", {
+                    Name = "Label",
+                    Text = config.Title or "Toggle",
+                    TextColor3 = Theme.Colors.Text,
+                    TextSize = 14,
+                    Font = Theme.Fonts.English,
+                    TextXAlignment = Enum.TextXAlignment.Left,
+                    BackgroundTransparency = 1,
+                    Position = UDim2.new(0, 36, 0, 0),
+                    Size = UDim2.new(0.6, -36, 1, 0)
+                })
+                label.Parent = toggle
+                
+                -- Toggle Switch
+                local switch = Utils.Create("Frame", {
+                    Name = "Switch",
+                    Size = UDim2.new(0, 50, 0, 25),
+                    Position = UDim2.new(1, -8, 0.5, 0),
+                    AnchorPoint = Vector2.new(1, 0.5),
+                    BackgroundColor3 = Theme.Colors.Secondary,
+                    BackgroundTransparency = 0.3
+                })
+                
+                local switchCorner = Utils.Create("UICorner", {
+                    CornerRadius = UDim.new(1, 0)
+                })
+                switchCorner.Parent = switch
+                
+                local switchStroke = Utils.Create("UIStroke", {
+                    Color = Theme.Colors.Accent,
+                    Transparency = 0.5,
+                    Thickness = 2
+                })
+                switchStroke.Parent = switch
+                
+                -- Toggle Circle
+                local toggleCircle = Utils.Create("Frame", {
+                    Name = "ToggleCircle",
+                    Size = UDim2.new(0, 20, 0, 20),
+                    Position = UDim2.new(0, 3, 0.5, 0),
+                    AnchorPoint = Vector2.new(0, 0.5),
+                    BackgroundColor3 = Theme.Colors.Text,
+                    BackgroundTransparency = 0
+                })
+                
+                local circleCorner = Utils.Create("UICorner", {
+                    CornerRadius = UDim.new(1, 0)
+                })
+                circleCorner.Parent = toggleCircle
+                
+                -- State management
+                local state = config.Default or false
+                local flagName = config.Flag or config.Title
+                
+                if flagName then
+                    self.Tab.Window.Flags[flagName] = state
+                end
+                
+                local function updateToggle()
+                    if state then
+                        Utils.Tween(switch, {BackgroundColor3 = Theme.Colors.Success})
+                        Utils.Tween(toggleCircle, {Position = UDim2.new(1, -23, 0.5, 0)})
+                        Utils.Tween(toggleIcon, {ImageColor3 = Theme.Colors.Success})
+                        toggleIcon.Image = Icons["toggleright"] or Icons["checkcircle"]
+                    else
+                        Utils.Tween(switch, {BackgroundColor3 = Theme.Colors.Secondary})
+                        Utils.Tween(toggleCircle, {Position = UDim2.new(0, 3, 0.5, 0)})
+                        Utils.Tween(toggleIcon, {ImageColor3 = Theme.Colors.SubText})
+                        toggleIcon.Image = Icons["toggleleft"] or Icons["xcircle"]
+                    end
+                    
+                    if flagName then
+                        self.Tab.Window.Flags[flagName] = state
+                        self.Tab.Window.Config[flagName] = state
+                    end
+                    
+                    if config.Callback then
+                        config.Callback(state)
+                    end
+                end
+                
+                -- Interactive area
+                local interactive = Utils.Create("TextButton", {
+                    Size = UDim2.new(1, 0, 1, 0),
+                    BackgroundTransparency = 1,
+                    Text = "",
+                    AutoButtonColor = false
+                })
+                
+                interactive.MouseButton1Click:Connect(function()
+                    state = not state
+                    updateToggle()
+                    Animations.Pulse(switch)
+                end)
+                
+                Utils.CreateHoverEffect(switch)
+                toggleCircle.Parent = switch
+                switch.Parent = toggle
+                interactive.Parent = toggle
+                toggle.Parent = self.Container
+                
+                -- Load saved state
+                if flagName and self.Tab.Window.Config[flagName] ~= nil then
+                    state = self.Tab.Window.Config[flagName]
+                end
+                
+                updateToggle()
+                
+                return {
+                    Frame = toggle,
+                    GetState = function() return state end,
+                    SetState = function(newState)
+                        state = newState
+                        updateToggle()
+                    end
+                }
+            end
+            
+            function sectionObj:AddSlider(config)
+                config = config or {}
+                local slider = Utils.Create("Frame", {
+                    Name = "Slider_" .. config.Title,
+                    Size = UDim2.new(1, 0, 0, 65),
+                    BackgroundTransparency = 1,
+                    LayoutOrder = #self.Container:GetChildren() + 1
+                })
+                
+                -- Header
+                local header = Utils.Create("Frame", {
+                    Size = UDim2.new(1, 0, 0, 28),
+                    BackgroundTransparency = 1
+                })
+                
+                -- Icon
+                local sliderIcon = Utils.CreateIcon(config.Icon or "sliders", UDim2.new(0, 20, 0, 20), Theme.Colors.SubText, header)
+                sliderIcon.Position = UDim2.new(0, 8, 0.5, 0)
+                sliderIcon.AnchorPoint = Vector2.new(0, 0.5)
+                
+                -- Label
+                local label = Utils.Create("TextLabel", {
+                    Name = "Label",
+                    Text = config.Title or "Slider",
+                    TextColor3 = Theme.Colors.Text,
+                    TextSize = 14,
+                    Font = Theme.Fonts.English,
+                    TextXAlignment = Enum.TextXAlignment.Left,
+                    BackgroundTransparency = 1,
+                    Position = UDim2.new(0, 36, 0, 0),
+                    Size = UDim2.new(0.5, -36, 1, 0)
+                })
+                label.Parent = header
+                
+                -- Value display
+                local valueLabel = Utils.Create("TextLabel", {
+                    Name = "Value",
+                    Text = tostring(config.Default or config.Min or 0),
+                    TextColor3 = Theme.Colors.Accent,
+                    TextSize = 14,
+                    Font = Enum.Font.SourceSansBold,
+                    TextXAlignment = Enum.TextXAlignment.Right,
+                    BackgroundTransparency = 1,
+                    Size = UDim2.new(0.5, -8, 1, 0),
+                    Position = UDim2.new(0.5, 0, 0, 0)
+                })
+                valueLabel.Parent = header
+                
+                header.Parent = slider
+                
+                -- Slider Track
+                local track = Utils.Create("Frame", {
+                    Name = "Track",
+                    Size = UDim2.new(1, -16, 0, 6),
+                    Position = UDim2.new(0, 8, 0, 40),
+                    BackgroundColor3 = Theme.Colors.Secondary,
+                    BackgroundTransparency = 0.4
+                })
+                
+                local trackCorner = Utils.Create("UICorner", {
+                    CornerRadius = UDim.new(1, 0)
+                })
+                trackCorner.Parent = track
+                
+                local trackStroke = Utils.Create("UIStroke", {
+                    Color = Theme.Colors.Accent,
+                    Transparency = 0.6,
+                    Thickness = 1.5
+                })
+                trackStroke.Parent = track
+                
+                -- Fill
+                local fill = Utils.Create("Frame", {
+                    Name = "Fill",
+                    Size = UDim2.new(0, 0, 1, 0),
+                    BackgroundColor3 = Theme.Colors.Accent,
+                    BackgroundTransparency = 0.2
+                })
+                
+                local fillCorner = Utils.Create("UICorner", {
+                    CornerRadius = UDim.new(1, 0)
+                })
+                fillCorner.Parent = fill
+                
+                -- Thumb
+                local thumb = Utils.Create("Frame", {
+                    Name = "Thumb",
+                    Size = UDim2.new(0, 20, 0, 20),
+                    Position = UDim2.new(0, -10, 0.5, 0),
+                    AnchorPoint = Vector2.new(0, 0.5),
+                    BackgroundColor3 = Theme.Colors.Text,
+                    ZIndex = 2
+                })
+                
+                local thumbCorner = Utils.Create("UICorner", {
+                    CornerRadius = UDim.new(1, 0)
+                })
+                thumbCorner.Parent = thumb
+                
+                local thumbStroke = Utils.Create("UIStroke", {
+                    Color = Theme.Colors.Accent,
+                    Thickness = 3,
+                    Transparency = 0
+                })
+                thumbStroke.Parent = thumb
+                
+                -- State
+                local min = config.Min or 0
+                local max = config.Max or 100
+                local value = config.Default or min
+                local flagName = config.Flag or config.Title
+                local dragging = false
+                
+                if flagName then
+                    self.Tab.Window.Flags[flagName] = value
+                end
+                
+                local function updateSlider(mouseX)
+                    local absolutePosition = track.AbsolutePosition.X
+                    local absoluteSize = track.AbsoluteSize.X
+                    
+                    local relativeX = math.clamp(mouseX - absolutePosition, 0, absoluteSize)
+                    local percentage = relativeX / absoluteSize
+                    
+                    value = math.floor(min + (max - min) * percentage)
+                    valueLabel.Text = tostring(value)
+                    
+                    fill.Size = UDim2.new(percentage, 0, 1, 0)
+                    thumb.Position = UDim2.new(percentage, -10, 0.5, 0)
+                    
+                    if flagName then
+                        self.Tab.Window.Flags[flagName] = value
+                        self.Tab.Window.Config[flagName] = value
+                    end
+                    
+                    if config.Callback then
+                        config.Callback(value)
+                    end
+                end
+                
+                -- Input handling
+                thumb.InputBegan:Connect(function(input)
+                    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+                        dragging = true
+                        Utils.Tween(thumb, {Size = UDim2.new(0, 24, 0, 24)})
+                    end
+                end)
+                
+                thumb.InputEnded:Connect(function(input)
+                    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+                        dragging = false
+                        Utils.Tween(thumb, {Size = UDim2.new(0, 20, 0, 20)})
+                    end
+                end)
+                
+                track.InputBegan:Connect(function(input)
+                    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+                        updateSlider(input.Position.X)
+                        Animations.Pulse(thumb)
+                    end
+                end)
+                
+                UserInputService.InputChanged:Connect(function(input)
+                    if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
+                        updateSlider(input.Position.X)
+                    end
+                end)
+                
+                fill.Parent = track
+                thumb.Parent = track
+                track.Parent = slider
+                slider.Parent = self.Container
+                
+                -- Load saved value
+                if flagName and self.Tab.Window.Config[flagName] ~= nil then
+                    value = self.Tab.Window.Config[flagName]
+                end
+                
+                updateSlider(track.AbsolutePosition.X + (track.AbsoluteSize.X * ((value - min) / (max - min))))
+                
+                return {
+                    Frame = slider,
+                    GetValue = function() return value end,
+                    SetValue = function(newValue)
+                        value = math.clamp(newValue, min, max)
+                        updateSlider(track.AbsolutePosition.X + (track.AbsoluteSize.X * ((value - min) / (max - min))))
+                    end
+                }
+            end
+            
+            function sectionObj:AddDropdown(config)
+                config = config or {}
+                local dropdown = Utils.Create("Frame", {
+                    Name = "Dropdown_" .. config.Title,
+                    Size = UDim2.new(1, 0, 0, 38),
+                    BackgroundTransparency = 1,
+                    LayoutOrder = #self.Container:GetChildren() + 1
+                })
+                
+                -- Icon
+                local dropdownIcon = Utils.CreateIcon(config.Icon or "list", UDim2.new(0, 20, 0, 20), Theme.Colors.SubText, dropdown)
+                dropdownIcon.Position = UDim2.new(0, 8, 0.5, 0)
+                dropdownIcon.AnchorPoint = Vector2.new(0, 0.5)
+                
+                -- Label
+                local label = Utils.Create("TextLabel", {
+                    Name = "Label",
+                    Text = config.Title or "Dropdown",
+                    TextColor3 = Theme.Colors.Text,
+                    TextSize = 14,
+                    Font = Theme.Fonts.English,
+                    TextXAlignment = Enum.TextXAlignment.Left,
+                    BackgroundTransparency = 1,
+                    Position = UDim2.new(0, 36, 0, 0),
+                    Size = UDim2.new(0.6, -36, 1, 0)
+                })
+                label.Parent = dropdown
+                
+                -- Dropdown Button
+                local button = Utils.Create("TextButton", {
+                    Name = "Button",
+                    Text = config.Default or config.Options and config.Options[1] or "Select...",
+                    TextColor3 = Theme.Colors.Text,
+                    TextSize = 13,
+                    Font = Theme.Fonts.English,
+                    BackgroundColor3 = Theme.Colors.Secondary,
+                    BackgroundTransparency = 0.3,
+                    Size = UDim2.new(0.4, -8, 1, 0),
+                    Position = UDim2.new(0.6, 0, 0, 0),
+                    AutoButtonColor = false
+                })
+                
+                local buttonCorner = Utils.Create("UICorner", {
+                    CornerRadius = UDim.new(0, Theme.CornerRadius.Small)
+                })
+                buttonCorner.Parent = button
+                
+                local arrow = Utils.Create("ImageLabel", {
+                    Image = Icons["chevronup"],
+                    ImageColor3 = Theme.Colors.Text,
+                    ImageTransparency = 0.5,
+                    BackgroundTransparency = 1,
+                    Size = UDim2.new(0, 16, 0, 16),
+                    Position = UDim2.new(1, -20, 0.5, 0),
+                    AnchorPoint = Vector2.new(1, 0.5)
+                })
+                arrow.Parent = button
+                
+                -- Dropdown List
+                local list = Utils.Create("ScrollingFrame", {
+                    Name = "List",
+                    Size = UDim2.new(0.4, -8, 0, 0),
+                    Position = UDim2.new(0.6, 0, 1, 5),
+                    BackgroundColor3 = Theme.Colors.Primary,
+                    BackgroundTransparency = 0.1,
+                    ScrollBarThickness = 4,
+                    ScrollBarImageColor3 = Theme.Colors.Accent,
+                    CanvasSize = UDim2.new(0, 0, 0, 0),
+                    Visible = false,
+                    ZIndex = 10
+                })
+                
+                local listCorner = Utils.Create("UICorner", {
+                    CornerRadius = UDim.new(0, Theme.CornerRadius.Small)
+                })
+                listCorner.Parent = list
+                
+                local listLayout = Utils.Create("UIListLayout", {
+                    SortOrder = Enum.SortOrder.LayoutOrder
+                })
+                listLayout.Parent = list
+                
+                -- Create options
+                local options = config.Options or {}
+                local selected = config.Default or options[1]
+                local flagName = config.Flag or config.Title
+                local isOpen = false
+                
+                if flagName then
+                    self.Tab.Window.Flags[flagName] = selected
+                end
+                
+                local function toggleList()
+                    isOpen = not isOpen
+                    list.Visible = isOpen
+                    if isOpen then
+                        Utils.Tween(list, {Size = UDim2.new(0.4, -8, 0, math.min(#options * 32, 160))})
+                        arrow.Image = Icons["chevrondown"]
+                    else
+                        Utils.Tween(list, {Size = UDim2.new(0.4, -8, 0, 0)})
+                        arrow.Image = Icons["chevronup"]
+                    end
+                end
+                
+                local function selectOption(option)
+                    selected = option
+                    button.Text = option
+                    toggleList()
+                    
+                    if flagName then
+                        self.Tab.Window.Flags[flagName] = selected
+                        self.Tab.Window.Config[flagName] = selected
+                    end
+                    
+                    if config.Callback then
+                        config.Callback(option)
+                    end
+                end
+                
+                for i, option in ipairs(options) do
+                    local optionButton = Utils.Create("TextButton", {
+                        Text = option,
+                        TextColor3 = Theme.Colors.Text,
+                        TextSize = 13,
+                        Font = Theme.Fonts.English,
+                        BackgroundColor3 = Theme.Colors.Secondary,
+                        BackgroundTransparency = 0.8,
+                        Size = UDim2.new(1, -10, 0, 30),
+                        Position = UDim2.new(0, 5, 0, (i-1)*32),
+                        AutoButtonColor = false,
+                        ZIndex = 11,
+                        LayoutOrder = i
+                    })
+                    
+                    local optionCorner = Utils.Create("UICorner", {
+                        CornerRadius = UDim.new(0, Theme.CornerRadius.Small)
+                    })
+                    optionCorner.Parent = optionButton
+                    
+                    optionButton.MouseButton1Click:Connect(function()
+                        selectOption(option)
+                    end)
+                    
+                    optionButton.MouseEnter:Connect(function()
+                        Utils.Tween(optionButton, {BackgroundTransparency = 0.6})
+                    end)
+                    
+                    optionButton.MouseLeave:Connect(function()
+                        Utils.Tween(optionButton, {BackgroundTransparency = 0.8})
+                    end)
+                    
+                    optionButton.Parent = list
+                end
+                
+                listLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
+                    list.CanvasSize = UDim2.new(0, 0, 0, listLayout.AbsoluteContentSize.Y)
+                end)
+                
+                -- Button click handler
+                button.MouseButton1Click:Connect(toggleList)
+                
+                -- Close dropdown when clicking outside
+                UserInputService.InputBegan:Connect(function(input)
+                    if isOpen and input.UserInputType == Enum.UserInputType.MouseButton1 then
+                        local mousePos = input.Position
+                        local buttonAbsPos = button.AbsolutePosition
+                        local buttonSize = button.AbsoluteSize
+                        local listAbsPos = list.AbsolutePosition
+                        local listSize = list.AbsoluteSize
+                        
+                        if not (mousePos.X >= buttonAbsPos.X and mousePos.X <= buttonAbsPos.X + buttonSize.X and
+                               mousePos.Y >= buttonAbsPos.Y and mousePos.Y <= buttonAbsPos.Y + buttonSize.Y) and
+                           not (mousePos.X >= listAbsPos.X and mousePos.X <= listAbsPos.X + listSize.X and
+                               mousePos.Y >= listAbsPos.Y and mousePos.Y <= listAbsPos.Y + listSize.Y) then
+                            toggleList()
+                        end
+                    end
+                end)
+                
+                button.Parent = dropdown
+                list.Parent = dropdown
+                dropdown.Parent = self.Container
+                
+                -- Load saved selection
+                if flagName and self.Tab.Window.Config[flagName] then
+                    selected = self.Tab.Window.Config[flagName]
+                    button.Text = selected
+                end
+                
+                return {
+                    Frame = dropdown,
+                    GetSelected = function() return selected end,
+                    SetSelected = function(option)
+                        selected = option
+                        button.Text = option
+                        if config.Callback then
+                            config.Callback(option)
+                        end
+                    end
+                }
+            end
+            
+            function sectionObj:AddDescription(text)
+                local description = Utils.Create("TextLabel", {
+                    Name = "Description",
+                    Text = text,
+                    TextColor3 = Theme.Colors.SubText,
+                    TextSize = 13,
+                    Font = Theme.Fonts.English,
+                    TextWrapped = true,
+                    BackgroundTransparency = 1,
+                    Size = UDim2.new(1, 0, 0, 0),
+                    LayoutOrder = #self.Container:GetChildren() + 1
+                })
+                
+                description:GetPropertyChangedSignal("TextBounds"):Connect(function()
+                    description.Size = UDim2.new(1, 0, 0, description.TextBounds.Y + 10)
+                end)
+                
+                description.Parent = self.Container
+                
+                return {
+                    Label = description,
+                    SetText = function(newText) description.Text = newText end
+                }
+            end
+            
+            -- Custom Components
+            function sectionObj:AddCustomButton(config)
+                config = config or {}
+                local button = Utils.Create("TextButton", {
+                    Name = "CustomButton_" .. config.Title,
+                    Text = config.Title or "Custom Button",
+                    TextColor3 = Theme.Colors.Text,
+                    TextSize = 14,
+                    Font = Theme.Fonts.English,
+                    BackgroundColor3 = config.Style == "Neon" and Theme.Colors.Accent or Theme.Colors.Secondary,
+                    BackgroundTransparency = config.Style == "Neon" and 0.1 or 0.2,
+                    Size = UDim2.new(1, 0, 0, 42),
+                    LayoutOrder = #self.Container:GetChildren() + 1,
+                    AutoButtonColor = false
+                })
+                
+                local uicorner = Utils.Create("UICorner", {
+                    CornerRadius = UDim.new(0, Theme.CornerRadius.Medium)
+                })
+                uicorner.Parent = button
+                
+                local uistroke = Utils.Create("UIStroke", {
+                    Color = config.Style == "Neon" and Theme.Colors.LightAccent or Theme.Colors.Accent,
+                    Transparency = config.Style == "Neon" and 0.3 or 0.5,
+                    Thickness = 2
+                })
+                uistroke.Parent = button
+                
+                -- Neon glow effect
+                if config.Style == "Neon" then
+                    local glow = Utils.Create("Frame", {
+                        Size = UDim2.new(1, 4, 1, 4),
+                        Position = UDim2.new(0, -2, 0, -2),
+                        BackgroundColor3 = Theme.Colors.Accent,
+                        BackgroundTransparency = 0.8,
+                        ZIndex = -1
+                    })
+                    Utils.Create("UICorner", {CornerRadius = UDim.new(0, Theme.CornerRadius.Medium)}).Parent = glow
+                    glow.Parent = button
+                end
+                
+                -- Hover effects
+                Utils.CreateHoverEffect(button)
+                
+                -- Click animation
+                button.MouseButton1Click:Connect(function()
+                    Animations.Shake(button)
+                    if config.Callback then
+                        config.Callback()
+                    end
+                end)
+                
+                button.Parent = self.Container
+                
+                return {
+                    Button = button,
+                    SetText = function(text) button.Text = text end
+                }
+            end
+            
+            function sectionObj:AddSocialInvite(config)
+                config = config or {}
+                local platform = config.Platform or "Discord"
+                local invite = Utils.Create("Frame", {
+                    Name = "SocialInvite_" .. platform,
+                    Size = UDim2.new(1, 0, 0, 60),
+                    BackgroundColor3 = Theme.Colors.Secondary,
+                    BackgroundTransparency = 0.8,
+                    LayoutOrder = #self.Container:GetChildren() + 1
+                })
+                
+                local corner = Utils.Create("UICorner", {
+                    CornerRadius = UDim.new(0, Theme.CornerRadius.Medium)
+                })
+                corner.Parent = invite
+                
+                local stroke = Utils.Create("UIStroke", {
+                    Color = Theme.Colors.Accent,
+                    Transparency = 0.5,
+                    Thickness = 1.5
+                })
+                stroke.Parent = invite
+                
+                -- Platform Icon
+                local iconName = platform:lower()
+                local platformIcon = Utils.CreateIcon(iconName, UDim2.new(0, 32, 0, 32), Theme.Colors.Accent, invite)
+                platformIcon.Position = UDim2.new(0, 15, 0.5, 0)
+                platformIcon.AnchorPoint = Vector2.new(0, 0.5)
+                
+                -- Text
+                local textLabel = Utils.Create("TextLabel", {
+                    Text = config.Text or "Join our " .. platform,
+                    TextColor3 = Theme.Colors.Text,
+                    TextSize = 14,
+                    Font = Theme.Fonts.English,
+                    TextXAlignment = Enum.TextXAlignment.Left,
+                    BackgroundTransparency = 1,
+                    Position = UDim2.new(0, 60, 0, 10),
+                    Size = UDim2.new(0.6, -65, 0, 20)
+                })
+                textLabel.Parent = invite
+                
+                -- Invite Code
+                local codeLabel = Utils.Create("TextLabel", {
+                    Text = config.Invite or "discord.gg/xxxx",
+                    TextColor3 = Theme.Colors.SubText,
+                    TextSize = 12,
+                    Font = Theme.Fonts.English,
+                    TextXAlignment = Enum.TextXAlignment.Left,
+                    BackgroundTransparency = 1,
+                    Position = UDim2.new(0, 60, 0, 30),
+                    Size = UDim2.new(0.6, -65, 0, 20)
+                })
+                codeLabel.Parent = invite
+                
+                -- Copy Button
+                local copyButton = Utils.Create("TextButton", {
+                    Text = "Copy",
+                    TextColor3 = Theme.Colors.Text,
+                    TextSize = 13,
+                    Font = Theme.Fonts.English,
+                    BackgroundColor3 = Theme.Colors.Accent,
+                    BackgroundTransparency = 0.3,
+                    Size = UDim2.new(0.25, -10, 0, 32),
+                    Position = UDim2.new(0.75, 5, 0.5, 0),
+                    AnchorPoint = Vector2.new(0, 0.5),
+                    AutoButtonColor = false
+                })
+                
+                local copyCorner = Utils.Create("UICorner", {
+                    CornerRadius = UDim.new(0, Theme.CornerRadius.Small)
+                })
+                copyCorner.Parent = copyButton
+                
+                copyButton.MouseButton1Click:Connect(function()
+                    if config.Invite then
+                        setclipboard(config.Invite)
+                        Animations.Pulse(copyButton)
+                        copyButton.Text = "Copied!"
+                        wait(1)
+                        copyButton.Text = "Copy"
+                    end
+                end)
+                
+                Utils.CreateHoverEffect(copyButton)
+                copyButton.Parent = invite
+                invite.Parent = self.Container
+                
+                return {
+                    Frame = invite,
+                    UpdateInvite = function(newInvite)
+                        codeLabel.Text = newInvite
+                    end
+                }
+            end
+            
+            function sectionObj:AddAd(config)
+                config = config or {}
+                local ad = Utils.Create("Frame", {
+                    Name = "Ad_" .. config.Title,
+                    Size = UDim2.new(1, 0, 0, 80),
+                    BackgroundColor3 = Theme.Colors.Surface,
+                    BackgroundTransparency = 0.7,
+                    LayoutOrder = #self.Container:GetChildren() + 1
+                })
+                
+                local corner = Utils.Create("UICorner", {
+                    CornerRadius = UDim.new(0, Theme.CornerRadius.Medium)
+                })
+                corner.Parent = ad
+                
+                local stroke = Utils.Create("UIStroke", {
+                    Color = Theme.Colors.Accent,
+                    Transparency = 0.4,
+                    Thickness = 2
+                })
+                stroke.Parent = ad
+                
+                -- Animated gradient background
+                local gradient = Utils.Create("UIGradient", {
+                    Rotation = 45,
+                    Color = ColorSequence.new({
+                        ColorSequenceKeypoint.new(0, Theme.Colors.Accent),
+                        ColorSequenceKeypoint.new(0.5, Theme.Colors.LightAccent),
+                        ColorSequenceKeypoint.new(1, Theme.Colors.Accent)
+                    }),
+                    Transparency = NumberSequence.new({
+                        NumberSequenceKeypoint.new(0, 0.8),
+                        NumberSequenceKeypoint.new(1, 0.9)
+                    })
+                })
+                gradient.Parent = ad
+                
+                -- Animate gradient
+                spawn(function()
+                    while ad.Parent do
+                        for i = 0, 360, 5 do
+                            if not ad.Parent then break end
+                            gradient.Rotation = i
+                            wait(0.05)
+                        end
+                    end
+                end)
+                
+                -- Title
+                local title = Utils.Create("TextLabel", {
+                    Text = config.Title or "Advertisement",
+                    TextColor3 = Theme.Colors.Text,
+                    TextSize = 16,
+                    Font = Enum.Font.SourceSansBold,
+                    TextXAlignment = Enum.TextXAlignment.Center,
+                    BackgroundTransparency = 1,
+                    Position = UDim2.new(0, 0, 0, 10),
+                    Size = UDim2.new(1, 0, 0, 25)
+                })
+                title.Parent = ad
+                
+                -- Description
+                local description = Utils.Create("TextLabel", {
+                    Text = config.Description or "Sponsored Content",
+                    TextColor3 = Theme.Colors.SubText,
+                    TextSize = 13,
+                    Font = Theme.Fonts.English,
+                    TextXAlignment = Enum.TextXAlignment.Center,
+                    BackgroundTransparency = 1,
+                    Position = UDim2.new(0, 0, 0, 35),
+                    Size = UDim2.new(1, 0, 0, 20)
+                })
+                description.Parent = ad
+                
+                -- Link
+                local link = Utils.Create("TextButton", {
+                    Text = config.Link or "Visit Website",
+                    TextColor3 = Theme.Colors.Accent,
+                    TextSize = 12,
+                    Font = Theme.Fonts.English,
+                    BackgroundTransparency = 1,
+                    Position = UDim2.new(0, 0, 0, 55),
+                    Size = UDim2.new(1, 0, 0, 20),
+                    AutoButtonColor = false
+                })
+                
+                link.MouseButton1Click:Connect(function()
+                    if config.Link then
+                        -- Open link (you can implement browser opening here)
+                        print("Opening:", config.Link)
+                    end
+                end)
+                
+                link.Parent = ad
+                ad.Parent = self.Container
+                
+                return {
+                    Frame = ad,
+                    UpdateContent = function(newConfig)
+                        if newConfig.Title then title.Text = newConfig.Title end
+                        if newConfig.Description then description.Text = newConfig.Description end
+                        if newConfig.Link then link.Text = newConfig.Link end
+                    end
+                }
+            end
+            
+            function sectionObj:AddCustomSection(config)
+                config = config or {}
+                local customSection = Utils.Create("Frame", {
+                    Name = "CustomSection_" .. config.Title,
+                    Size = UDim2.new(1, 0, 0, 0),
+                    BackgroundColor3 = Theme.Colors.Surface,
+                    BackgroundTransparency = 0.8,
+                    LayoutOrder = #self.Container:GetChildren() + 1
+                })
+                
+                local corner = Utils.Create("UICorner", {
+                    CornerRadius = UDim.new(0, Theme.CornerRadius.Medium)
+                })
+                corner.Parent = customSection
+                
+                -- Animated header
+                local header = Utils.Create("Frame", {
+                    Size = UDim2.new(1, 0, 0, 45),
+                    BackgroundColor3 = Theme.Colors.Accent,
+                    BackgroundTransparency = 0.7
+                })
+                
+                local headerCorner = Utils.Create("UICorner", {
+                    CornerRadius = UDim.new(0, Theme.CornerRadius.Medium, 0, 0)
+                })
+                headerCorner.Parent = header
+                
+                -- Animated gradient
+                local headerGradient = Utils.Create("UIGradient", {
+                    Rotation = 0,
+                    Color = ColorSequence.new({
+                        ColorSequenceKeypoint.new(0, Theme.Colors.Accent),
+                        ColorSequenceKeypoint.new(1, Theme.Colors.LightAccent)
+                    })
+                })
+                headerGradient.Parent = header
+                
+                -- Animate header gradient
+                spawn(function()
+                    while header.Parent do
+                        for i = 0, 360, 2 do
+                            if not header.Parent then break end
+                            headerGradient.Rotation = i
+                            wait(0.02)
+                        end
+                    end
+                end)
+                
+                -- Title
+                local title = Utils.Create("TextLabel", {
+                    Text = config.Title or "Custom Section",
+                    TextColor3 = Theme.Colors.Text,
+                    TextSize = 18,
+                    Font = Enum.Font.SourceSansBold,
+                    TextXAlignment = Enum.TextXAlignment.Center,
+                    BackgroundTransparency = 1,
+                    Size = UDim2.new(1, 0, 1, 0)
+                })
+                title.Parent = header
+                
+                -- Container
+                local container = Utils.Create("Frame", {
+                    Name = "Container",
+                    Size = UDim2.new(1, -20, 1, -55),
+                    Position = UDim2.new(0, 10, 0, 55),
+                    BackgroundTransparency = 1
+                })
+                
+                local listLayout = Utils.Create("UIListLayout", {
+                    SortOrder = Enum.SortOrder.LayoutOrder,
+                    Padding = UDim.new(0, 10)
+                })
+                listLayout.Parent = container
+                
+                listLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
+                    customSection.Size = UDim2.new(1, 0, 0, listLayout.AbsoluteContentSize.Y + 65)
+                end)
+                
+                header.Parent = customSection
+                container.Parent = customSection
+                customSection.Parent = self.Container
+                
+                local customSectionObj = {
+                    Frame = customSection,
+                    Header = header,
+                    Container = container
+                }
+                
+                return customSectionObj
+            end
+            
+            -- Register custom component if available
+            function sectionObj:AddComponent(name, config)
+                if UltimateUI.RegisteredComponents[name] then
+                    return UltimateUI.RegisteredComponents[name](self, config)
+                else
+                    warn("Component not registered:", name)
+                    return nil
+                end
+            end
+            
+            return sectionObj
+        end
+        
+        -- Register tab in window
+        table.insert(self.Tabs, tabObj)
+        
+        return tabObj
+    end
+    
+    return windowObj
+end
+
+-- Initialize Library
+function UltimateUI.new()
+    local self = setmetatable({}, UltimateUI)
+    
+    -- Register default components
+    self:RegisterComponent("Button", function(section, config)
+        return section:AddButton(config)
+    end)
+    
+    self:RegisterComponent("Toggle", function(section, config)
+        return section:AddToggle(config)
+    end)
+    
+    self:RegisterComponent("Slider", function(section, config)
+        return section:AddSlider(config)
+    end)
+    
+    self:RegisterComponent("Dropdown", function(section, config)
+        return section:AddDropdown(config)
+    end)
+    
+    self:RegisterComponent("Description", function(section, config)
+        return section:AddDescription(config)
+    end)
+    
+    self:RegisterComponent("CustomButton", function(section, config)
+        return section:AddCustomButton(config)
+    end)
+    
+    self:RegisterComponent("SocialInvite", function(section, config)
+        return section:AddSocialInvite(config)
+    end)
+    
+    self:RegisterComponent("Ad", function(section, config)
+        return section:AddAd(config)
+    end)
+    
+    self:RegisterComponent("CustomSection", function(section, config)
+        return section:AddCustomSection(config)
+    end)
+    
+    return self
+end
+
+-- Create singleton instance
+local Library = UltimateUI.new()
+
+-- Export the library
+return Library
